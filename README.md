@@ -16,8 +16,8 @@ Pipeline steps:
 
 ## 1. Dependencies
 
-[Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4)
-[dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install)
+* [Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4)
+* [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install)
 
 ## 2. Installation
 
