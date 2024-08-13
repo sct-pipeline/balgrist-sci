@@ -13,6 +13,7 @@ Pipeline steps:
 * [2. Installation](#2-installation)
   * [2.1 SCT Installation](#21-sct-installation)
   * [2.2 dcm2niix Installation](#22-dcm2niix-installation)
+* [3. Processing pipeline](#3-processing-pipeline)
 
 ## 1. Dependencies
 
@@ -93,3 +94,7 @@ dcm2niix --version
 ```
 
 The expected output is the version of `dcm2niix`.
+
+## 3. Processing pipeline
+
+TODO
