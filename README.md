@@ -8,15 +8,20 @@ Pipeline steps:
 3. Quality control (QC) + manual compression level labeling
 4. Lesion metric computation
 
+## Table of contents
+* [1. Dependencies](#1-dependencies)
+* [2. Installation](#2-installation)
+  * [2.1 SCT Installation](#21-sct-installation)
+  * [2.2 dcm2niix Installation](#22-dcm2niix-installation)
 
-## Dependencies
+## 1. Dependencies
 
 [Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4)
 [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install)
 
-## Installation
+## 2. Installation
 
-### SCT Installation
+### 2.1 SCT Installation
 
 1. Open a new terminal:
 
@@ -58,7 +63,7 @@ echo $SCT_DIR
 
 The expected output is `[OK]` for all dependencies.
 
-### dcm2niix Installation
+### 2.2 dcm2niix Installation
 
 1. Open a new terminal (if you closed the previous one):
 
