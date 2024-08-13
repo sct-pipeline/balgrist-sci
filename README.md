@@ -60,7 +60,9 @@ cd spinalcordtoolbox-6.4
 Close the terminal and open a new one (press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.).
 
 ```bash
+# Check that SCT was installed correctly
 sct_check_dependencies
+# Display location of SCT installation
 echo $SCT_DIR
 ```
 
