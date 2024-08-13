@@ -39,7 +39,7 @@ rm 6.4.zip
 cd spinalcordtoolbox-6.4
 # Install SCT v6.4
 ./install_sct -iyc
-#  '-i'   Install in-place; this is the default when working from git.
+#  '-i'   Install in-place (i.e., in the current directory)
 #  '-y'   Install without interruption with 'yes' as default answer
 #  '-c'   Disables sct_check_dependencies so we can check it separately
 ```
