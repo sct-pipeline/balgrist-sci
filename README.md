@@ -21,6 +21,9 @@ Pipeline steps:
 
 ## 2. Installation
 
+> [!NOTE]
+> The installation process below is currently only supported on macOS.
+
 ### 2.1 SCT Installation
 
 1. Open a new terminal:
