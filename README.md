@@ -27,6 +27,8 @@ Pipeline steps:
 
 ### 2.1 SCT Installation
 
+<details><summary>Click the triangle to expand/collapse the section</summary>
+
 1. Open a new terminal:
 
 Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
@@ -69,7 +71,11 @@ echo $SCT_DIR
 
 The expected output is `[OK]` for all dependencies.
 
+</details>
+
 ### 2.2 dcm2niix Installation
+
+<details><summary>Click the triangle to expand/collapse the section</summary>
 
 1. Open a new terminal (if you closed the previous one):
 
@@ -94,6 +100,8 @@ dcm2niix --version
 ```
 
 The expected output is the version of `dcm2niix`.
+
+</details>
 
 ## 3. Processing pipeline
 
