@@ -13,7 +13,7 @@ Pipeline steps:
 * [2. Installation](#2-installation)
   * [2.1 SCT Installation](#21-sct-installation)
   * [2.2 dcm2niix Installation](#22-dcm2niix-installation)
-* [3. Processing pipeline](#3-processing-pipeline)
+* [3. Data structure](#3-data-structure)
 
 ## 1. Dependencies
 
@@ -99,6 +99,49 @@ The expected output is the version of `dcm2niix`.
 
 </details>
 
-## 3. Processing pipeline
+## 3. Data structure
 
-TODO
+<details><summary>Click the triangle to expand/collapse the section</summary>
+
+Expected data structure compliant with the [BIDS standard](https://bids-specification.readthedocs.io/en/stable/):
+
+```
+├── sourcedata              --> folder containing DICOM files for each subject
+│   ├── dir_20230711        --> folder with DICOM files for first subject and first session
+│   ├── dir_20230711        --> folder with DICOM files for second subject and first session
+│   ├── ... 
+│   ├── dir_20240815        --> folder with DICOM files for first subject and second session
+│   └── ... 
+├── sub-001                 --> folder containing NIfTI files for first subject
+│   ├── ses-01              --> first session
+│   │  ├── anat             --> folder with anatomical data
+│   │  │  ├── sub-001_ses-01_T2w.nii.gz
+│   │  │  ├── sub-001_ses-01_T2w_copression.nii.gz
+│   │  │  ├── ...
+│   │  └── dwi              --> folder with diffusion data
+│   │     ├── sub-001_ses-01_dwi.nii.gz
+│   │     ├── sub-001_ses-01_dwi.bval
+│   │     ├── sub-001_ses-01_dwi.bvec
+│   └── ses-02              --> second session
+│      ├── ...
+├── sub-002                 --> folder containing NIfTI files for second subject
+│   ├── ...
+├── ...
+└── derivatives             --> folder to store visually checked and/or manually corrected data (for example, spinal cord segmentations)
+    └── labels
+        ├── sub-001         --> folder with corrected data for first subject
+        │   ├── ses-01      --> first session
+        │   │  ├── anat
+        │   │  │  ├── sub-001_ses-01_T2w_label-SC_seg.nii.gz              --> spinal cord (SC) binary segmentation 
+        │   │  │  ├── sub-001_ses-01_T2w_label-compression_label.nii.gz   --> binary compression labeling
+        │   │  │  ├── ...
+        │   │  └── dwi
+        │   │     ├── sub-001_ses-01_dwi_label-SC_seg.nii.gz
+        │   │     ├── ...
+        │   └── ses-02      --> second session
+        │      ├── ...
+        ├── sub-002 
+        └── ...
+```
+
+</details>
