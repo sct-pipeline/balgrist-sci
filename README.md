@@ -35,8 +35,7 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 
 2. Run the following commands in the terminal (you can copy-paste the whole block):
 
-> [!NOTE]
-> The installation process will take a few minutes.
+ℹ️ The installation process will take a few minutes.
 
 ```bash
 # Go to your home directory
@@ -54,9 +53,6 @@ cd spinalcordtoolbox-6.4
 #  '-y'   Install without interruption with 'yes' as default answer
 #  '-c'   Disables sct_check_dependencies so we can check it separately
 ```
-
-> [!NOTE]
-> We are not using `git clone` because Apple Developer Tools are needed for `git`.
 
 3. Check that SCT was installed correctly:
 
