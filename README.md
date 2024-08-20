@@ -103,13 +103,13 @@ The expected output is the version of `dcm2niix`.
 
 <details><summary>Click the triangle to expand/collapse the section</summary>
 
-Expected data structure compliant with the [BIDS standard](https://bids-specification.readthedocs.io/en/stable/) is shown below.
+Expected [BIDS](https://bids-specification.readthedocs.io/en/stable/)-like structures is shown below.
 
 Note that only the `sourcedata` directory containing folders with DICOM files for each subject is required. 
 The rest of the directories and files will be created during the processing.
 
 ```
-├── participants.tsv        --> file with participant information; see example below
+├── participants.tsv        --> file with participants information; see example below
 ├── sourcedata              --> folder containing DICOM files for each subject
 │   ├── dir_20230711        --> folder with DICOM files for first subject and first session
 │   ├── dir_20230711        --> folder with DICOM files for second subject and first session
