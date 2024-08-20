@@ -152,10 +152,10 @@ The rest of the directories and files will be created during the processing.
 
 | participant_id | ses_id | source_id | age | sex |
 |----------------|--------|-----------|-----|-----|
-| sub-01         | ses-01 | dir_20230711 | 42  | M   |
-| sub-01         | ses-02 | dir_20240815 | 43  | M   |
-| sub-02         | ses-01 | dir_20230713 | 57  | F   |
+| sub-001        | ses-01 | dir_20230711 | 42  | M   |
+| sub-001        | ses-02 | dir_20240815 | 43  | M   |
+| sub-002        | ses-01 | dir_20230713 | 57  | F   |
 
-ℹ️ Notice that we use one row per session. This means that, for example, `sub-01` has two rows in the table because they have two sessions.
+ℹ️ Notice that we use one row per session. This means that, for example, `sub-001` has two rows in the table because they have two sessions.
 
 </details>
