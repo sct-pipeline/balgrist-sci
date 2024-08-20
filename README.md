@@ -109,6 +109,7 @@ Note that only the `sourcedata` directory containing folders with DICOM files fo
 The rest of the directories and files will be created during the processing.
 
 ```
+├── participants.tsv        --> file with participant information; see example below
 ├── sourcedata              --> folder containing DICOM files for each subject
 │   ├── dir_20230711        --> folder with DICOM files for first subject and first session
 │   ├── dir_20230711        --> folder with DICOM files for second subject and first session
@@ -146,5 +147,15 @@ The rest of the directories and files will be created during the processing.
         ├── sub-002 
         └── ...
 ```
+
+`participants.tsv` example:
+
+| participant_id | ses_id | source_id | age | sex |
+|----------------|--------|-----------|-----|-----|
+| sub-01         | ses-01 | dir_20230711 | 42  | M   |
+| sub-01         | ses-02 | dir_20240815 | 43  | M   |
+| sub-02         | ses-01 | dir_20230713 | 57  | F   |
+
+ℹ️ Notice that we use one row per session. This means that, for example, `sub-01` has two rows in the table because they have two sessions.
 
 </details>
