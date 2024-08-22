@@ -56,8 +56,7 @@ def get_image_info(file_path):
     """
     Get the dimensions and pixel size of the image at the given file path.
 
-    Args:
-    file_path (str): Path to the image file.
+    :param file_path: Path to the image file
     """
     img = nib.load(file_path)
     zooms = img.header.get_zooms()
@@ -137,6 +136,12 @@ def validate_dwi_image(fname):
 
 
 def get_nii_info_dataframe(temp_folder):
+    """
+    Get the information about the NIfTI images in the temporary folder and store it in a DataFrame.
+
+    :param temp_folder: Path to the temporary folder with NIfTI images
+    :return: DataFrame with image information
+    """
     # Get all nii files in the temporary folder
     nii_files = [f for f in os.listdir(temp_folder) if f.endswith('.nii.gz')]
 
