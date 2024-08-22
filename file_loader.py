@@ -146,11 +146,11 @@ def get_t2_image_path():
     print(10*"-")
     # Get T2w image path
     while True:
-        t2w_path = get_valid_file_path("Please specify the path to the T2w image: ")
+        path_t2w = get_valid_file_path("Please specify the path to the T2w image: ")
 
         # If the image info is confirmed, return the image path
-        if confirm_image_info(t2w_path):
-            return t2w_path
+        if confirm_image_info(path_t2w):
+            return path_t2w
         print("Let's try another T2w image.")
 
 
@@ -188,13 +188,13 @@ def get_dwi_image_path():
         print("Let's try another DWI image.")
 
 
-def copy_files_to_bids_folder(output_folder, participant_id, session_id, t2w_path, dwi_path):
+def copy_files_to_bids_folder(output_folder, participant_id, session_id, path_t2w, dwi_path):
     """
     Copy the converted nii images from the temporary folder to the output BIDS folder
     :param output_folder: temporary folder with the converted nii images
     :param participant_id: participant ID, e.g., sub-001
     :param session_id: session ID, e.g., ses-01
-    :param t2w_path: path to the T2w image provided by the user
+    :param path_t2w: path to the T2w image provided by the user
     :param dwi_path: path to the DWI image provided by the user
     """
     # First, create anat and dwi subfolders if they do not exist
@@ -204,10 +204,10 @@ def copy_files_to_bids_folder(output_folder, participant_id, session_id, t2w_pat
     os.makedirs(output_folder_dwi, exist_ok=True)
 
     # Second, move the images and JSON sidecars to the respective folders
-    t2w_path_output = os.path.join(output_folder_anat, f"{participant_id}_{session_id}_T2w.nii.gz")
+    path_t2w_output = os.path.join(output_folder_anat, f"{participant_id}_{session_id}_T2w.nii.gz")
     dwi_path_output = os.path.join(output_folder_dwi, f"{participant_id}_{session_id}_dwi.nii.gz")
-    shutil.copy(t2w_path, t2w_path_output)
-    shutil.copy(t2w_path.replace('.nii.gz', '.json'), t2w_path_output.replace('.nii.gz', '.json'))
+    shutil.copy(path_t2w, path_t2w_output)
+    shutil.copy(path_t2w.replace('.nii.gz', '.json'), path_t2w_output.replace('.nii.gz', '.json'))
     # For DWI, we also need to copy the bval and bvec files
     shutil.copy(dwi_path, dwi_path_output)
     shutil.copy(dwi_path.replace('.nii.gz', '.json'), dwi_path_output.replace('.nii.gz', '.json'))
@@ -260,11 +260,11 @@ def main():
     print(100*"-")
 
     # Get the paths to the converted T2w and DWI images
-    t2w_path = get_t2_image_path()
+    path_t2w = get_t2_image_path()
     dwi_path = get_dwi_image_path()
 
     # Copy the files to the BIDS folder
-    copy_files_to_bids_folder(output_folder, participant_id, session_id, t2w_path, dwi_path)
+    copy_files_to_bids_folder(output_folder, participant_id, session_id, path_t2w, dwi_path)
 
     print("\nAll files have been successfully validated and confirmed.")
 
