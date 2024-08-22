@@ -8,6 +8,9 @@ Namely, the script:
     - checks for .bval and .bvec files for DWI image
     - provides information about the images' dimensions and pixel sizes
 
+Requirements:
+    - dcm2niix -- see the Installation section in the README.md file
+
 Author: Jan Valosek and Claude 3.5 Sonnet
 """
 import os
