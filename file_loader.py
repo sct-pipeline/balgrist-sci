@@ -49,6 +49,15 @@ def get_parser():
         help="Session ID. Example: ses-01",
         required=True
     )
+    parser.add_argument(
+        "-contrasts",
+        help="MRI contrasts to use. Example: T2w dwi",
+        nargs='+',
+        default=["T2w", "dwi"],
+        type=list,
+        required=False
+    )
+
     return parser.parse_args()
 
 
@@ -208,6 +217,7 @@ def main():
     bids_folder = os.path.expanduser(args.bids_folder)
     participant_id = args.participant
     session_id = args.session
+    contrasts = args.contrasts
 
     print(100*"-")
     print(f'Dicom folder: {dicom_folder}')
@@ -249,7 +259,7 @@ def main():
 
     # Select images intended for further processing
     images_to_use_dict = {}
-    for contrast in ["T2w", "dwi"]:
+    for contrast in contrasts:
         images_to_use_dict[contrast] = select_image(contrast, nii_info_df, temp_folder)
 
     # Copy the files to the BIDS folder
