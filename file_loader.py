@@ -241,6 +241,7 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
 
     # Second, move the images and JSON sidecars to the respective folders
     fname_output = os.path.join(output_folder, f"{participant_id}_{session_id}_{contrast}.nii.gz")
+    print(f"Info: Copying {fname} to {fname_output}")
     shutil.copy(fname, fname_output)
     shutil.copy(fname.replace('.nii.gz', '.json'), fname_output.replace('.nii.gz', '.json'))
     # For DWI, we also need to copy the bval and bvec files
@@ -305,8 +306,8 @@ def main():
         images_to_use_dict[contrast] = select_image(contrast, nii_info_df, temp_folder)
 
     # Copy the files to the BIDS folder
+    print('')
     for contrast, fname in images_to_use_dict.items():
-        print(f"Copying {contrast} image to the BIDS folder.")
         copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
 
     if args.debug:
