@@ -33,6 +33,12 @@ def get_parser():
         required=True
     )
     parser.add_argument(
+        "-bids-folder",
+        help="Path to the BIDS folder where the converted NIfTI images will be stored. "
+             "Example: ~/sci-balgrist-study/bids",
+        required=True
+    )
+    parser.add_argument(
         "-participant",
         help="Participant ID. Example: sub-001",
         required=True
@@ -217,24 +223,33 @@ def main():
     args = get_parser()
 
     dicom_folder = args.dicom_folder
+    bids_folder = args.bids_folder
     participant_id = args.participant
     session_id = args.session
 
     print(100*"-")
     print(f'Dicom folder: {dicom_folder}')
+    print(f'BIDS folder: {bids_folder}')
     print(f'Participant ID: {participant_id}')
     print(f'Session ID: {session_id}')
     print(100*"-")
 
     # Check if the folder with DICOMs exists
     if not os.path.isdir(dicom_folder):
-        print(f"Error: Provided folder with DICOM images does not exist: {args.dicom_folder}")
+        print(f"Error: Provided folder with DICOM images does not exist: {dicom_folder}")
         exit(1)
 
+    # Check whether the BIDS folder already exists, if so, warn the user and exit
+    output_folder = os.path.join(bids_folder, participant_id, session_id)
+    if os.path.isdir(output_folder):
+        print(f"Error: BIDS folder for the provided participant and session already exists: {output_folder}"
+              f"\nPlease remove the existing BIDS folder and rerun the script.")
+        exit(1)
+    else:
+        # Create the output folder if it does not exist
+        os.makedirs(output_folder, exist_ok=True)
+
     # Run DICOM to NIfTI conversion using the dcm2niix command
-    output_folder = os.path.join(os.path.dirname(args.dicom_folder), "bids", participant_id, session_id)
-    # Create the output folder if it does not exist
-    os.makedirs(output_folder, exist_ok=True)
     run_dcm2niix(dicom_folder, output_folder)
 
     print(100*"-")
