@@ -1,9 +1,9 @@
 """
-This python script provides interactive prompts for users to retry input if files are not found or if the image
-information is not as expected.
+Convert DICOM images to NIfTI format and identify images for the further analysis.
 
 Namely, the script:
-    - allow users to specify paths for T2w and DWI images
+    - run dcm2niix command to convert DICOM images to NIfTI format
+    - prompts the user to select the images for further processing
     - validates file existence
     - checks for .bval and .bvec files for DWI image
     - provides information about the images' dimensions and pixel sizes
