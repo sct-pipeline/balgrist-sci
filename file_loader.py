@@ -72,12 +72,8 @@ def run_dcm2niix(dicom_folder, temp_folder):
     """
     Run dcm2niix command to convert DICOM images to NIfTI format.
 
-    Args:
-    dicom_folder (str): Path to the folder containing DICOM images.
-    temp_folder (str): Path to the temporary folder for NIfTI images.
-
-    Returns:
-    tuple: Paths to the converted T2w and DWI NIfTI files.
+    :param dicom_folder: Path to the folder containing DICOM images.
+    :param temp_folder: Path to the temporary folder where the NIfTI images will be stored.
     """
 
     cmd = [
