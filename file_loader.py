@@ -40,6 +40,11 @@ Output file structure:
 
 Author: Jan Valosek and Claude 3.5 Sonnet
 """
+
+# TODO: write a new entry to the participant.tsv file based on the provided information (add sex and age args?)
+# TODO: use logging instead of print statements
+
+
 import os
 import shutil
 import argparse
