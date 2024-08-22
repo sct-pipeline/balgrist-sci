@@ -129,6 +129,8 @@ def run_dcm2niix(dicom_folder, output_folder):
         dicom_folder
     ]
 
+    print("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix.\n")
+
     os.system(" ".join(cmd))
 
 
@@ -248,6 +250,7 @@ def main():
     else:
         # Create the output folder if it does not exist
         os.makedirs(output_folder, exist_ok=True)
+        print(f"\nInfo: Converted NIfTI images will be stored in: {output_folder}")
 
     # Run DICOM to NIfTI conversion using the dcm2niix command
     run_dcm2niix(dicom_folder, output_folder)
