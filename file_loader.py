@@ -92,6 +92,13 @@ def get_parser():
         type=list,
         required=False
     )
+    parser.add_argument(
+        "-debug",
+        help="If used, the temporary folder with NIfTI images will NOT be removed.",
+        action="store_true",
+        default=False,
+        required=False
+    )
 
     return parser.parse_args()
 
@@ -302,9 +309,12 @@ def main():
         print(f"Copying {contrast} image to the BIDS folder.")
         copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
 
-    # Lastly, remove the temporary folder
-    print("\nInfo: Removing the temporary folder {temp_folder}")
-    shutil.rmtree(os.path.join(output_folder, "temp_dcm2niix"))
+    if args.debug:
+        print(f"\nInfo: Temporary folder with NIfTI images is stored in: {temp_folder}")
+    # Remove the temporary folder
+    else:
+        print(f"\nInfo: Removing the temporary folder {temp_folder}")
+        shutil.rmtree(temp_folder)
 
     print(100*"-")
     print("All files have been successfully converted and validated. You can find the following images in the "
