@@ -12,7 +12,6 @@ Author: Jan Valosek and Claude 3.5 Sonnet
 """
 import os
 import shutil
-import subprocess
 import argparse
 import nibabel as nib
 
@@ -29,7 +28,8 @@ def get_parser():
     )
     parser.add_argument(
         "-dicom-folder",
-        help="Path to the folder containing DICOM images. Example: ~/sci-balgrist-study/sourcedata/dir_20230711",
+        help="Path to the folder containing DICOM images. "
+             "Example: ~/sci-balgrist-study/sourcedata/dir_20230711",
         required=True
     )
     parser.add_argument(
