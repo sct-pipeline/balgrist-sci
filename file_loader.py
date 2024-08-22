@@ -11,6 +11,33 @@ Namely, the script:
 Requirements:
     - dcm2niix -- see the Installation section in the README.md file
 
+Input file structure:
+
+    └── source_data
+        └── dir_20231010
+            ├── MRc.1.3.12.2.543543
+            ├── ...
+            └── SRe. 1.3.12.2.5432233
+
+Output file structure:
+
+    ├── bids
+    │   └── sub-001
+    │       └── ses-01
+    │           ├── anat
+    │           │   ├── sub-001_ses-01_T2w.json
+    │           │   └── sub-001_ses-01_T2w.nii.gz
+    │           └── dwi
+    │               ├── sub-001_ses-01_dwi.bval
+    │               ├── sub-001_ses-01_dwi.bvec
+    │               ├── sub-001_ses-01_dwi.json
+    │               └── sub-001_ses-01_dwi.nii.gz
+    └── source_data
+        └── dir_20231010
+            ├── MRc.1.3.12.2.543543
+            ├── ...
+            └── SRe. 1.3.12.2.5432233
+
 Author: Jan Valosek and Claude 3.5 Sonnet
 """
 import os
