@@ -89,7 +89,6 @@ def get_parser():
         help="MRI contrasts to use. Example: T2w dwi",
         nargs='+',
         default=["T2w", "dwi"],
-        type=list,
         required=False
     )
     parser.add_argument(
