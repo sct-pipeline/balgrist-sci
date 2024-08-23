@@ -14,6 +14,8 @@ Pipeline steps:
   * [2.1 SCT Installation](#21-sct-installation)
   * [2.2 dcm2niix Installation](#22-dcm2niix-installation)
 * [3. Data structure](#3-data-structure)
+  * [3.1 File organization](#31-file-organization)
+  * [3.2 DICOM to NIfTI conversion](#32-dicom-to-nifti-conversion)
 
 ## 1. Dependencies
 
