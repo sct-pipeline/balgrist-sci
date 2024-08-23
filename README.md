@@ -167,3 +167,18 @@ The rest of the directories and files will be created during the processing; see
 ℹ️ Notice that we use one row per session. This means that, for example, `sub-001` has two rows in the table because they have two sessions.
 
 </details>
+
+### 3.2 DICOM to NIfTI conversion
+
+A single subject DICOM images can be converted to NIfTI and organized according to the BIDS standard using 
+the `file_loader.py` script.
+
+Example usage:
+
+```bash
+python ~/code/balgrist-sci/file_loader.py \
+  -dicom-folder ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
+  -bids-folder ~/data/experiments/balgrist-sci/bids \ 
+  -participant sub-001 \
+  -session ses-01 
+```
