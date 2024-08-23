@@ -101,12 +101,14 @@ The expected output is the version of `dcm2niix`.
 
 ## 3. Data structure
 
+### 3.1 File organization
+
 <details><summary>Click the triangle to expand/collapse the section</summary>
 
-Expected [BIDS](https://bids-specification.readthedocs.io/en/stable/)-like structures is shown below.
+A file organization according to the [BIDS](https://bids-specification.readthedocs.io/en/stable/) is shown below.
 
-Note that only the `sourcedata` directory containing folders with DICOM files for each subject is required. 
-The rest of the directories and files will be created during the processing.
+Note that only the `sourcedata` directory containing folders with DICOM files for each subject is initially required. 
+The rest of the directories and files will be created during the processing; see the next section.
 
 ```
 ├── participants.tsv        --> file with participants information; see example below
