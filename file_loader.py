@@ -197,6 +197,9 @@ def get_nii_info_dataframe(temp_folder):
     # Get all nii files in the temporary folder
     nii_files = [f for f in os.listdir(temp_folder) if f.endswith('.nii.gz')]
 
+    # Sort nii files based on the series number (the last number in the file name before the .nii.gz extension)
+    nii_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
+
     # Create lists to store the information
     file_names = []
     dimensions_list = []
