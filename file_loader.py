@@ -154,7 +154,7 @@ def select_image(contrast, nii_info_df, temp_folder):
         time.sleep(0.5)
         row_number = int(input(f"Please specify the row number of the {contrast} image you want to use: "))
         if row_number < 0 or row_number >= len(nii_info_df):
-            logging.error("Invalid image number. Please try again.")
+            logging.info("Warning: Invalid image number. Please try again.")
             continue
         else:
             fname = nii_info_df.iloc[row_number]['File Name']
@@ -180,8 +180,8 @@ def validate_dwi_image(fname):
 
     # Check whether both bval and bvec files exist (we need them for DWI processing)
     if not os.path.isfile(fname_bval) or not os.path.isfile(fname_bvec):
-        logging.error("bval or bvec file is missing for the provided DWI image."
-                      "\nPlease try another DWI image.")
+        logging.info("Warning: bval or bvec file is missing for the provided DWI image."
+                     "\nPlease try another DWI image.")
         return False
     else:
         return True
