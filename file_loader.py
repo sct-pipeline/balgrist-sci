@@ -198,6 +198,11 @@ def get_nii_info_dataframe(temp_folder):
     # Get all nii files in the temporary folder
     nii_files = [f for f in os.listdir(temp_folder) if f.endswith('.nii.gz')]
 
+    # Check if there are any NIfTI files in the folder, if not, print error message and exit
+    if not nii_files:
+        logging.error("Error: No NIfTI files found in the temporary folder.")
+        exit(1)
+
     # Sort nii files based on the series number (the last number in the file name before the .nii.gz extension)
     nii_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
 
