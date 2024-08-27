@@ -128,7 +128,7 @@ def run_dcm2niix(dicom_folder, temp_folder):
     cmd = [
         "dcm2niix",
         "-z", "y",      # Compress output
-        "-f", "%p_%s",  # Custom filename format: %p - protocol name, %s - series number
+        "-f", "%d_%p_%s",  # Custom filename format: %d - series description, %p - protocol name, %s - series number
         "-i", "y",      # Ignore derived, localizer and 2D images
         "-o", temp_folder,
         dicom_folder
