@@ -111,8 +111,8 @@ def get_image_info(file_path):
     img = nib.load(file_path)
     zooms = img.header.get_zooms()
 
-    dimensions = f"{img.shape[0]} x {img.shape[1]} x {img.shape[2]}"
-    pixel_size = f"{zooms[0]:.2f} mm x {zooms[1]:.2f} mm x {zooms[2]:.2f} mm"
+    dimensions = f"{img.shape[0]}×{img.shape[1]}×{img.shape[2]}"
+    pixel_size = f"{zooms[0]:.2f}×{zooms[1]:.2f}×{zooms[2]:.2f}"
 
     return dimensions, pixel_size
 
