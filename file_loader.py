@@ -152,7 +152,8 @@ def select_image(contrast, nii_info_df, temp_folder):
     # Ask the user to provide a row number (df index) corresponding to the image
     while True:
         time.sleep(0.5)
-        row_number = int(input(f"Please specify the row number of the {contrast} image you want to use: "))
+        row_number = int(input(f"Please specify the row number (from 0 to {len(nii_info_df)-1}) of the {contrast} "
+                               f"image you want to use: "))
         if row_number < 0 or row_number >= len(nii_info_df):
             logging.info("Warning: Invalid image number. Please try again.")
             continue
