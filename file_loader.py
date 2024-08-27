@@ -213,7 +213,7 @@ def get_nii_info_dataframe(temp_folder):
     df = pd.DataFrame({
         'File Name': file_names,
         'Dimensions': dimensions_list,
-        'Pixel Size': pixel_sizes
+        'Pixel Size [mm]': pixel_sizes
     })
 
     return df
@@ -297,6 +297,7 @@ def main():
 
     nii_info_df = get_nii_info_dataframe(temp_folder)
     # Display the DataFrame
+    pd.set_option('display.max_colwidth', None)
     print(f'{nii_info_df}\n')
 
     # Select images intended for further processing
