@@ -42,14 +42,15 @@ Author: Jan Valosek and Claude 3.5 Sonnet
 """
 
 # TODO: write a new entry to the participant.tsv file based on the provided information (add sex and age args?)
-# TODO: use logging instead of print statements
-
 
 import os
 import shutil
 import argparse
 import pandas as pd
 import nibabel as nib
+import logging
+import time
+from datetime import datetime
 
 
 def get_parser():
@@ -134,7 +135,7 @@ def run_dcm2niix(dicom_folder, temp_folder):
         dicom_folder
     ]
 
-    print("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix.\n")
+    logging.info("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix.\n")
 
     os.system(" ".join(cmd))
 
@@ -150,9 +151,10 @@ def select_image(contrast, nii_info_df, temp_folder):
     """
     # Ask the user to provide a row number (df index) corresponding to the image
     while True:
+        time.sleep(0.5)
         row_number = int(input(f"Please specify the row number of the {contrast} image you want to use: "))
         if row_number < 0 or row_number >= len(nii_info_df):
-            print("Error: Invalid image number. Please try again.")
+            logging.error("Invalid image number. Please try again.")
             continue
         else:
             fname = nii_info_df.iloc[row_number]['File Name']
@@ -160,7 +162,7 @@ def select_image(contrast, nii_info_df, temp_folder):
                 if not validate_dwi_image(os.path.join(temp_folder, fname)):
                     continue
 
-            print(f"Selected {contrast} image: {fname}")
+            logging.info(f"Selected {contrast} image: {fname}")
             return os.path.join(temp_folder, fname)
 
 
@@ -178,8 +180,8 @@ def validate_dwi_image(fname):
 
     # Check whether both bval and bvec files exist (we need them for DWI processing)
     if not os.path.isfile(fname_bval) or not os.path.isfile(fname_bvec):
-        print("Error: bval or bvec file is missing for the provided DWI image."
-              "\nPlease try another DWI image.")
+        logging.error("bval or bvec file is missing for the provided DWI image."
+                      "\nPlease try another DWI image.")
         return False
     else:
         return True
@@ -240,7 +242,7 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
 
     # Second, move the images and JSON sidecars to the respective folders
     fname_output = os.path.join(output_folder, f"{participant_id}_{session_id}_{contrast}.nii.gz")
-    print(f"Info: Copying {fname} to {fname_output}")
+    logging.info(f"Copying {fname} to {fname_output}")
     shutil.copy(fname, fname_output)
     shutil.copy(fname.replace('.nii.gz', '.json'), fname_output.replace('.nii.gz', '.json'))
     # For DWI, we also need to copy the bval and bvec files
@@ -261,44 +263,63 @@ def main():
     session_id = args.session
     contrasts = args.contrasts
 
-    print(100*"-")
-    print(f'Dicom folder: {dicom_folder}')
-    print(f'BIDS folder: {bids_folder}')
-    print(f'Participant ID: {participant_id}')
-    print(f'Session ID: {session_id}')
-    print(100*"-")
+    # Configure logging
+    log_directory = os.path.join(bids_folder, "logs")
+    os.makedirs(log_directory, exist_ok=True)
+    log_filename = f"dicom_to_nifti_{participant_id}_{session_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    log_filepath = os.path.join(log_directory, log_filename)
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(message)s',
+        handlers=[
+            logging.FileHandler(log_filepath),
+            logging.StreamHandler()  # This will maintain console output
+        ]
+    )
+
+    logging.info(f"Log file created at: {log_filepath}")
+
+    logging.info(100*"-")
+    logging.info(f'Dicom folder: {dicom_folder}')
+    logging.info(f'BIDS folder: {bids_folder}')
+    logging.info(f'Participant ID: {participant_id}')
+    logging.info(f'Session ID: {session_id}')
+    logging.info(100*"-")
 
     # Check if the folder with DICOMs exists
     if not os.path.isdir(dicom_folder):
-        print(f"Error: Provided folder with DICOM images does not exist: {dicom_folder}")
+        logging.error(f"Provided folder with DICOM images does not exist: {dicom_folder}")
         exit(1)
 
     # Check whether the BIDS folder already exists, if so, warn the user and exit
     output_folder = os.path.join(bids_folder, participant_id, session_id)
     if os.path.isdir(output_folder):
-        print(f"Error: BIDS folder for the provided participant and session already exists: {output_folder}"
-              f"\nPlease remove the existing BIDS folder and rerun the script.")
+        logging.error(f"BIDS folder for the provided participant and session already exists: {output_folder}"
+                      f"\nPlease remove the existing BIDS folder and rerun the script.")
         exit(1)
     else:
         # Create the output folder if it does not exist
         os.makedirs(output_folder, exist_ok=True)
-        print(f"\nInfo: Converted NIfTI images will be stored in: {output_folder}")
+        logging.info(f"Converted NIfTI images will be stored in: {output_folder}")
 
     # Create a temporary folder to store dcm2niix output before renaming the files
     temp_folder = os.path.join(output_folder, "temp_dcm2niix")
-    print(f"\nInfo: Creating a temporary folder for NIfTI images: {temp_folder}")
+    logging.info(f"Creating a temporary folder for dcm2niix conversion: {temp_folder}")
     os.makedirs(temp_folder, exist_ok=True)
     # Run DICOM to NIfTI conversion using the dcm2niix command
     run_dcm2niix(dicom_folder, temp_folder)
 
-    print(100*"-")
-    print("DICOM to NIfTI is done. Please review the images and select images for further processing.")
-    print(100*"-")
+    logging.info(100*"-")
+    logging.info("DICOM to NIfTI is done. Please review the images and select images for further processing.")
+    logging.info(100*"-")
 
     nii_info_df = get_nii_info_dataframe(temp_folder)
     # Display the DataFrame
     pd.set_option('display.max_colwidth', None)
-    print(f'{nii_info_df}\n')
+    logging.info(f'{nii_info_df}\n')
+    # Sleep for 1 second to ensure that the pandas output is displayed before the user input
+    time.sleep(1)
 
     # Select images intended for further processing
     images_to_use_dict = {}
@@ -306,22 +327,22 @@ def main():
         images_to_use_dict[contrast] = select_image(contrast, nii_info_df, temp_folder)
 
     # Copy the files to the BIDS folder
-    print('')
+    logging.info('')
     for contrast, fname in images_to_use_dict.items():
         copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
 
     if args.debug:
-        print(f"\nInfo: Temporary folder with NIfTI images is stored in: {temp_folder}")
+        logging.info(f"\nInfo: Temporary folder with NIfTI images is stored in: {temp_folder}")
     # Remove the temporary folder
     else:
-        print(f"\nInfo: Removing the temporary folder {temp_folder}")
+        logging.info(f"\nInfo: Removing the temporary folder {temp_folder}")
         shutil.rmtree(temp_folder)
 
-    print(100*"-")
-    print("All files have been successfully converted and validated. You can find the following images in the "
-          "BIDS folder:")
-    print(f"\t{output_folder}")
-    print(100*"-")
+    logging.info(100*"-")
+    logging.info("All files have been successfully converted and validated. You can find the following images in the "
+                 "BIDS folder:")
+    logging.info(f"\t{output_folder}")
+    logging.info(100*"-")
 
 
 if __name__ == "__main__":
