@@ -41,8 +41,6 @@ Output file structure:
 Author: Jan Valosek and Claude 3.5 Sonnet
 """
 
-# TODO: write a new entry to the participant.tsv file based on the provided information (add sex and age args?)
-
 import os
 import shutil
 import argparse
@@ -50,6 +48,7 @@ import pandas as pd
 import nibabel as nib
 import logging
 import time
+import csv
 from datetime import datetime
 
 
@@ -90,6 +89,21 @@ def get_parser():
         help="MRI contrasts to use. Example: T2w dwi",
         nargs='+',
         default=["T2w", "dwi"],
+        required=False
+    )
+    parser.add_argument(
+        "-age",
+        help="Subject's age at the time of the MRI scan. "
+             "Example: 25. Default: n/a",
+        default='n/a',
+        required=False
+    )
+    parser.add_argument(
+        "-sex",
+        help="Subject's sex. "
+             "Example: M. Default: n/a",
+        default='n/a',
+        choices=['M', 'F', 'n/a'],
         required=False
     )
     parser.add_argument(
@@ -260,6 +274,39 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
         shutil.copy(fname.replace('.nii.gz', '.bvec'), fname_output.replace('.nii.gz', '.bvec'))
 
 
+def write_participants_tsv(bids_folder, participant_id, session_id, source_id, age=None, sex=None):
+    """
+    Write a new entry into the participants.tsv file.
+
+    :param bids_folder: Path to the BIDS folder
+    :param participant_id: Participant ID (e.g., 'sub-001')
+    :param session_id: Session ID (e.g., 'ses-01')
+    :param source_id: Source ID (e.g., 'dir_20230711')
+    :param age: Age of the participant (optional)
+    :param sex: Sex of the participant (optional)
+    """
+    participants_file = os.path.join(bids_folder, 'participants.tsv')
+    file_exists = os.path.isfile(participants_file)
+
+    with open(participants_file, 'a', newline='') as tsvfile:
+        writer = csv.writer(tsvfile, delimiter='\t')
+
+        # Write header if file is new
+        if not file_exists:
+            writer.writerow(['participant_id', 'ses_id', 'source_id', 'age', 'sex'])
+            logging.info(f"Created new participants.tsv file at {participants_file}")
+
+        # Write participant data
+        writer.writerow([
+            participant_id,
+            session_id,
+            source_id,
+            age if age is not None else 'n/a',
+            sex if sex is not None else 'n/a'
+        ])
+        logging.info(f"Added entry for {participant_id}/{session_id} to participants.tsv")
+
+
 def main():
     """
     Main function
@@ -352,6 +399,10 @@ def main():
                  "BIDS folder:")
     logging.info(f"\t{output_folder}")
     logging.info(100*"-")
+
+    # Add call to write_participants_tsv
+    source_id = os.path.basename(os.path.normpath(dicom_folder))
+    write_participants_tsv(bids_folder, participant_id, session_id, source_id, args.age, args.sex)
 
 
 if __name__ == "__main__":
