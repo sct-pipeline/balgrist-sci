@@ -1,5 +1,5 @@
 """
-Convert DICOM images to NIfTI format and identify images for the further analysis.
+Convert DICOM images to NIfTI format and identify images for further analysis.
 
 Namely, the script:
     - run dcm2niix command to convert DICOM images to NIfTI format
