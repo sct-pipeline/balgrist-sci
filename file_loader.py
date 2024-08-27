@@ -292,13 +292,13 @@ def main():
 
     # Check if the folder with DICOMs exists
     if not os.path.isdir(dicom_folder):
-        logging.error(f"Provided folder with DICOM images does not exist: {dicom_folder}")
+        logging.error(f"Error: Provided folder with DICOM images does not exist: {dicom_folder}")
         exit(1)
 
     # Check whether the BIDS folder already exists, if so, warn the user and exit
     output_folder = os.path.join(bids_folder, participant_id, session_id)
     if os.path.isdir(output_folder):
-        logging.error(f"BIDS folder for the provided participant and session already exists: {output_folder}"
+        logging.error(f"Error: BIDS folder for the provided participant and session already exists: {output_folder}"
                       f"\nPlease remove the existing BIDS folder and rerun the script.")
         exit(1)
     else:
