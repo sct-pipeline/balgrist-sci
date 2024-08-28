@@ -13,6 +13,7 @@ Pipeline steps:
 * [2. Installation](#2-installation)
   * [2.1 SCT Installation](#21-sct-installation)
   * [2.2 dcm2niix Installation](#22-dcm2niix-installation)
+  * [2.3 Downloading this repository](#23-downloading-this-repository)
 * [3. Data structure](#3-data-structure)
   * [3.1 File organization](#31-file-organization)
   * [3.2 DICOM to NIfTI conversion](#32-dicom-to-nifti-conversion)
@@ -98,6 +99,37 @@ dcm2niix --version
 ```
 
 The expected output is the version of `dcm2niix`.
+
+</details>
+
+### 2.3 Downloading this repository
+
+<details><summary>Click the triangle to expand/collapse the section</summary>
+
+1. Open a new terminal (if you closed the previous one):
+
+Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
+
+2. Run the following commands in the terminal (you can copy-paste the whole block):
+
+```bash
+# Go to your home directory
+cd ~
+# Download (clone) the repository --> the repository will be downloaded to a directory named balgrist-sci
+git clone https://github.com/sct-pipeline/balgrist-sci.git balgrist-sci
+```
+
+TODO: Replace `git clone` by `wget` once we publish a repo release because Apple Developer Tools are needed for `git`.
+
+3. Check that the repository was downloaded correctly:
+
+```bash
+# Activate SCT conda environment
+source ./python/etc/profile.d/conda.sh
+conda activate venv_sct
+# Call the help of the file_loader.py script
+python ~/balgrist-sci/file_loader.py --help
+```
 
 </details>
 
