@@ -210,7 +210,7 @@ the `file_loader.py` script.
 Example usage:
 
 ```bash
-python ~/code/balgrist-sci/file_loader.py \
+python ~/balgrist-sci/file_loader.py \
   -dicom-folder ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
   -bids-folder ~/data/experiments/balgrist-sci/bids \ 
   -participant sub-001 \
