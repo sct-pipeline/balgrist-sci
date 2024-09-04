@@ -214,5 +214,6 @@ python ~/balgrist-sci/file_loader.py \
   -dicom-folder ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
   -bids-folder ~/data/experiments/balgrist-sci/bids \ 
   -participant sub-001 \
-  -session ses-01 
+  -session ses-01 \
+  -contrasts T2w dwi
 ```
