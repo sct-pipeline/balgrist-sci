@@ -342,13 +342,12 @@ def main():
         ]
     )
 
-    logging.info(f"Log file created at: {log_filepath}")
-
     logging.info(100*"-")
     logging.info(f'Dicom folder: {dicom_folder}')
     logging.info(f'BIDS folder: {bids_folder}')
     logging.info(f'Participant ID: {participant_id}')
     logging.info(f'Session ID: {session_id}')
+    logging.info(f"Log file will be stored in: {log_filepath}")
     logging.info(100*"-")
 
     # Check if the folder with DICOMs exists
