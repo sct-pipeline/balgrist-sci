@@ -68,7 +68,8 @@ def get_parser():
     argparse.Namespace: Parsed arguments
     """
     parser = argparse.ArgumentParser(
-        description="Convert DICOM to NIfTI and identify images for the further analysis."
+        description="Convert DICOM to NIfTI and identify images for the further analysis.",
+        formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
         "-dicom-folder",
