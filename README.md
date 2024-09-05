@@ -9,26 +9,29 @@ Steps:
 4. Lesion metric computation
 
 ## Table of contents
-* [1. Dependencies](#1-dependencies)
-* [2. Installation](#2-installation)
-  * [2.1 SCT Installation](#21-sct-installation)
-  * [2.2 dcm2niix Installation](#22-dcm2niix-installation)
-  * [2.3 Downloading this repository](#23-downloading-this-repository)
-* [3. Data structure](#3-data-structure)
-  * [3.1 File organization](#31-file-organization)
-  * [3.2 DICOM to NIfTI conversion](#32-dicom-to-nifti-conversion)
+- [1. Getting Started](#1-getting-started)
+  - [1.1 Dependencies](#11-dependencies)
+  - [1.2 Installation](#12-installation)
+    - [SCT Installation](#sct-installation)
+    - [dcm2niix Installation](#dcm2niix-installation)
+    - [Downloading this repository](#downloading-this-repository)
+- [2. Data structure](#2-data-structure)
+  - [2.1 File organization](#21-file-organization)
+  - [2.2 DICOM to NIfTI conversion](#22-dicom-to-nifti-conversion)
 
-## 1. Dependencies
+## 1. Getting Started
+
+### 1.1 Dependencies
 
 * [Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4): toolbox for processing spinal cord MRI data
 * [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install): tool for converting DICOM images into the NIfTI format
 
-## 2. Installation
+### 1.2 Installation
 
 > [!NOTE]
 > The installation process below is currently only supported on macOS.
 
-### 2.1 SCT Installation
+#### SCT Installation
 
 <details><summary>Click the triangle to expand/collapse the section</summary>
 
@@ -72,7 +75,7 @@ The expected output is `[OK]` for all dependencies.
 
 </details>
 
-### 2.2 dcm2niix Installation
+#### dcm2niix Installation
 
 <details><summary>Click the triangle to expand/collapse the section</summary>
 
@@ -102,7 +105,7 @@ The expected output is the version of `dcm2niix`.
 
 </details>
 
-### 2.3 Downloading this repository
+#### Downloading this repository
 
 <details><summary>Click the triangle to expand/collapse the section</summary>
 
@@ -133,9 +136,9 @@ python ~/balgrist-sci/file_loader.py --help
 
 </details>
 
-## 3. Data structure
+## 2. Data structure
 
-### 3.1 File organization
+### 2.1 File organization
 
 <details><summary>Click the triangle to expand/collapse the section</summary>
 
@@ -202,7 +205,7 @@ The rest of the directories and files will be created during the processing; see
 
 </details>
 
-### 3.2 DICOM to NIfTI conversion
+### 2.2 DICOM to NIfTI conversion
 
 A single subject DICOM images can be converted to NIfTI and organized according to the BIDS standard using 
 the `file_loader.py` script.
