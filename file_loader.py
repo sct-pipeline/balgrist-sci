@@ -95,7 +95,9 @@ def get_parser():
     )
     parser.add_argument(
         "-contrasts",
-        help="MRI contrasts to use. Example: T2w dwi",
+        help="MRI contrasts to use. Separate multiple contrasts with a space. Example: 'T2w dwi'\n"
+             "To distinguish between two images of the same contrast with different orientation, use the 'acq' tag, "
+             "for example: 'acq-axial_T2w acq-sag_T2w'",
         nargs='+',
         default=["T2w", "dwi"],
         required=False
