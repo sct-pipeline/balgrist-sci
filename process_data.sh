@@ -6,6 +6,20 @@
 #   1. Convert DICOM files to NIfTI format
 #   2. Run spinal cord analysis
 #
+# Requirements:
+#   - SCT (Spinal Cord Toolbox)
+#   - dcm2niix
+#
+# Example usage:
+#     bash process_data.sh \
+#       -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
+#       -b ~/data/experiments/balgrist-sci/bids \
+#       -p sub-001 \
+#       -s ses-01 \
+#       -c T2w dwi \
+#       -a 30 \
+#       -x M
+#
 # Authors: Jan Valosek, Sandrine Bedard
 # AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
 #
