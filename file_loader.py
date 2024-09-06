@@ -180,6 +180,19 @@ def select_image(contrast, nii_info_df, temp_folder):
         logging.info(f"Please specify the row number (from 0 to {len(nii_info_df)-1}) of the {contrast} "
                      f"image you want to use: ")
         user_input = input("")
+
+        # Check for empty input
+        if not user_input.strip():
+            logging.info("Warning: Input cannot be empty. Please try again.")
+            continue
+
+        # Check for non-integer input
+        try:
+            row_number = int(user_input)
+        except ValueError:
+            logging.info("Warning: Invalid input. Please enter a valid row number.")
+            continue
+
         if row_number < 0 or row_number >= len(nii_info_df):
             logging.info("Warning: Invalid image number. Please try again.")
             continue
