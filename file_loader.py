@@ -177,8 +177,9 @@ def select_image(contrast, nii_info_df, temp_folder):
     # Ask the user to provide a row number (df index) corresponding to the image
     while True:
         time.sleep(0.5)
-        row_number = int(input(f"Please specify the row number (from 0 to {len(nii_info_df)-1}) of the {contrast} "
-                               f"image you want to use: "))
+        logging.info(f"Please specify the row number (from 0 to {len(nii_info_df)-1}) of the {contrast} "
+                     f"image you want to use: ")
+        user_input = input("")
         if row_number < 0 or row_number >= len(nii_info_df):
             logging.info("Warning: Invalid image number. Please try again.")
             continue
@@ -265,6 +266,7 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
     :param output_folder: temporary folder with the converted nii images
     :param participant_id: participant ID, e.g., sub-001
     :param session_id: session ID, e.g., ses-01
+    :return: Path to the copied image in the BIDS folder
     """
     # First, create anat and dwi subfolders if they do not exist
     if contrast == "dwi":
@@ -283,6 +285,8 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
     if contrast == "dwi":
         shutil.copy(fname.replace('.nii.gz', '.bval'), fname_output.replace('.nii.gz', '.bval'))
         shutil.copy(fname.replace('.nii.gz', '.bvec'), fname_output.replace('.nii.gz', '.bvec'))
+
+    return fname_output
 
 
 def write_participants_tsv(bids_folder, participant_id, session_id, source_id, age=None, sex=None):
@@ -393,9 +397,11 @@ def main():
         images_to_use_dict[contrast] = select_image(contrast, nii_info_df, temp_folder)
 
     # Copy the files to the BIDS folder
+    images_bids_dict = dict()
     logging.info('')
     for contrast, fname in images_to_use_dict.items():
-        copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
+        image_bids = copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
+        images_bids_dict[contrast] = image_bids
 
     if args.debug:
         logging.info(f"\nInfo: Temporary folder with NIfTI images is stored in: {temp_folder}")
@@ -413,6 +419,10 @@ def main():
     # Add call to write_participants_tsv
     source_id = os.path.basename(os.path.normpath(dicom_folder))
     write_participants_tsv(bids_folder, participant_id, session_id, source_id, args.age, args.sex)
+
+    # Print images_bids_dict to standard output to be fetched by the bash script
+    for contrast, path in images_bids_dict.items():
+        print(f"VAR:{contrast}:{path}")
 
 
 if __name__ == "__main__":
