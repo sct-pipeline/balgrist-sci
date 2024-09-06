@@ -46,9 +46,9 @@ Output file structure:
             ├── ...
             └── SRe. 1.3.12.2.5432233
 
-Author: Jan Valosek and Claude 3.5 Sonnet
+Author: Jan Valosek
+AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
 """
-
 import os
 import shutil
 import argparse
@@ -104,14 +104,14 @@ def get_parser():
     )
     parser.add_argument(
         "-age",
-        help="Subject's age at the time of the MRI scan. "
+        help="Age of the subject at the time of the MRI scan. "
              "Example: 25. Default: n/a",
         default='n/a',
         required=False
     )
     parser.add_argument(
         "-sex",
-        help="Subject's sex. "
+        help="Sex of the subject. "
              "Example: M. Default: n/a",
         default='n/a',
         choices=['M', 'F', 'n/a'],
@@ -160,7 +160,7 @@ def run_dcm2niix(dicom_folder, temp_folder):
         dicom_folder
     ]
 
-    logging.info("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix.\n")
+    logging.info("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix...\n")
 
     os.system(" ".join(cmd))
 
@@ -332,7 +332,7 @@ def write_participants_tsv(bids_folder, participant_id, session_id, source_id, a
             age if age is not None else 'n/a',
             sex if sex is not None else 'n/a'
         ])
-        logging.info(f"Added entry for {participant_id}/{session_id} to participants.tsv")
+        logging.info(f"Info: Added entry for {participant_id}/{session_id} to participants.tsv")
 
 
 def main():
@@ -367,8 +367,11 @@ def main():
     logging.info(f'BIDS folder: {bids_folder}')
     logging.info(f'Participant ID: {participant_id}')
     logging.info(f'Session ID: {session_id}')
-    logging.info(f"Log file will be stored in: {log_filepath}")
+    logging.info(f'MRI contrasts to use: {contrasts}')
+    logging.info(f'Age: {args.age}')
+    logging.info(f'Sex: {args.sex}')
     logging.info(100*"-")
+    logging.info(f"Log file will be stored in: {log_filepath}")
 
     # Check if the folder with DICOMs exists
     if not os.path.isdir(dicom_folder):
@@ -424,7 +427,7 @@ def main():
         shutil.rmtree(temp_folder)
 
     logging.info(100*"-")
-    logging.info("All files have been successfully converted and validated. You can find the following images in the "
+    logging.info("All files have been successfully converted and validated. You can find the images in the "
                  "BIDS folder:")
     logging.info(f"\t{output_folder}")
     logging.info(100*"-")
