@@ -436,9 +436,6 @@ def main():
     source_id = os.path.basename(os.path.normpath(dicom_folder))
     write_participants_tsv(bids_folder, participant_id, session_id, source_id, args.age, args.sex)
 
-    # Print images_bids_dict to standard output to be fetched by the bash script
-    for contrast, path in images_bids_dict.items():
-        print(f"VAR:{contrast}:{path}")
 
 
 if __name__ == "__main__":

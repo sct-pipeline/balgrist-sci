@@ -112,10 +112,8 @@ check_dependencies()
 convert_dcm2nii()
 {
     # Call the file_loader.py script to convert DICOM files to NIfTI format
-    images_to_use=$(python "${REPO_DIR}"/file_loader.py -dicom-folder "$dicom_folder" -bids-folder "$bids_folder" -participant "$participant_id" -session "$session_id" -contrasts "${contrasts[@]}" -age "$age" -sex "$sex" | grep "^VAR:")
-
-    # Strip the 'VAR:' prefix and store them into an array
-    images_to_use_array=($(echo "$images_to_use" | sed 's/^VAR://'))
+    # TODO: redirect the output to LOG file to do not clutter the users terminal
+    python "${REPO_DIR}"/file_loader.py -dicom-folder "$dicom_folder" -bids-folder "$bids_folder" -participant "$participant_id" -session "$session_id" -contrasts "${contrasts[@]}" -age "$age" -sex "$sex"
 }
 
 # Create the results folder (specified by the '-r' arg) and copy the NIfTI images from bids folder (specified by
@@ -135,27 +133,47 @@ create_results_folder_and_copy_images()
 }
 
 
+process_t2w()
+{
+    local suffix=$1
+    # Go to anat folder where all structural data are located
+    cd anat
+
+    # Construct the file name based on the subject ID
+    file_t2="${participant_id}_${session_id}_${suffix}"
+
+    # Segment spinal cord (only if it does not exist)
+    # TODO: add 'segment_sc_if_does_not_exist' function to check for GT under derivatives/labels
+    # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
+    sct_deepseg_sc -i "$file_t2".nii.gz -c t2
+
+    # Open FSLEyes to visualize the segmentation
+    fsleyes "$file_t2".nii.gz "${file_t2}_seg.nii.gz" -cm red -a 70.0
+    # TODO: continue with the analysis
+}
+
 main_analysis()
 {
-    # Iterate over the array and split each contrast:path pair
-    for item in "${images_to_use_array[@]}"; do
-        # Use ':' as the delimiter to split the contrast and path
-        contrast=$(echo "$item" | cut -d ':' -f 1)
-        path=$(echo "$item" | cut -d ':' -f 2-)
     # Create the results folder and copy the images to it
     create_results_folder_and_copy_images
 
-        # Use the variables or print them
-        echo "Contrast: $contrast"
-        echo "Path: $path"
+    # Go to subject folder
+    cd "$participant_id"/"$session_id"
 
-        # If contrast T2w is found, assign the path to file1
-        if [[ $contrast == "T2w" ]]; then
-            sct_deepseg_sc -i "$path" -c t2
-            # TODO: continue with the analysis
-            # TODO: output the analysis results to the 'data_processed' folder (see README / 2.1 File organization)
-        fi
-
+    # Loop across contrasts (specified by the '-c' arg)
+    for contrast in "${contrasts[@]}"; do
+        case $contrast in
+            T2w)
+                echo "Processing T2w images..."
+                process_t2w $contrast
+                ;;
+            dwi)
+                echo "Processing DWI images..."
+                ;;
+            *)
+                echo "Unknown contrast: $contrast"
+                ;;
+        esac
     done
 }
 
