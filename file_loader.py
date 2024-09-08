@@ -363,6 +363,8 @@ def main():
     )
 
     logging.info(100*"-")
+    logging.info(f'Starting DICOM to NIfTI conversion using the script: {os.path.abspath(__file__)}')
+    logging.info(100*"-")
     logging.info(f'Dicom folder: {dicom_folder}')
     logging.info(f'BIDS folder: {bids_folder}')
     logging.info(f'Participant ID: {participant_id}')
@@ -436,6 +438,9 @@ def main():
     source_id = os.path.basename(os.path.normpath(dicom_folder))
     write_participants_tsv(bids_folder, participant_id, session_id, source_id, args.age, args.sex)
 
+    logging.info(100 * "-")
+    logging.info(f'{os.path.abspath(__file__)} finished successfully.')
+    logging.info(100 * "-")
 
 
 if __name__ == "__main__":
