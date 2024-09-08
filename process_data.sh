@@ -14,6 +14,7 @@
 #     bash process_data.sh \
 #       -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
 #       -b ~/data/experiments/balgrist-sci/bids \
+#       -r ~/data/experiments/balgrist-sci/data_processed \
 #       -p sub-001 \
 #       -s ses-01 \
 #       -c T2w dwi \
@@ -40,11 +41,12 @@ DESCRIPTION
   Requires that SCT, dcm2niix, and FSLeyes to be installed.
 
 USAGE
-  `basename ${0}` -d <dicom folder> -b <bids folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
+  `basename ${0}` -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
 
 MANDATORY ARGUMENTS
   -d <dicom folder>           Path to the folder containing DICOM images. Example: ~/sci-balgrist-study/sourcedata/dir_20230711
   -b <bids folder>            Path to the BIDS folder where the converted NIfTI images will be stored. Example: ~/sci-balgrist-study/bids
+  -r <results folder>         Path to the folder where the results will be stored. Example: ~/sci-balgrist-study/data_processed
   -p <participant id>         Participant ID. Example: sub-001
   -s <session id>             Session ID. Example: ses-01
   -c <contrasts>              MRI contrasts to use (space-separated if multiple). Example: 'T2w dwi'
@@ -116,6 +118,23 @@ convert_dcm2nii()
     images_to_use_array=($(echo "$images_to_use" | sed 's/^VAR://'))
 }
 
+# Create the results folder (specified by the '-r' arg) and copy the NIfTI images from bids folder (specified by
+# the '-b' arg) to it
+create_results_folder_and_copy_images()
+{
+    # Create data_processed folder if it does not exist to store the analysis results
+    if [ ! -d "$results_folder" ]; then
+        mkdir -p "$results_folder"
+    fi
+
+    # Go to folder where data will be copied and processed
+    cd "$results_folder"
+    # Copy source images
+    # Note: we use '/./' in order to include the sub-folder 'ses-0X'
+    rsync -Ravzh "$bids_folder"/./"$participant_id"/"$session_id" .
+}
+
+
 main_analysis()
 {
     # Iterate over the array and split each contrast:path pair
@@ -123,6 +142,8 @@ main_analysis()
         # Use ':' as the delimiter to split the contrast and path
         contrast=$(echo "$item" | cut -d ':' -f 1)
         path=$(echo "$item" | cut -d ':' -f 2-)
+    # Create the results folder and copy the images to it
+    create_results_folder_and_copy_images
 
         # Use the variables or print them
         echo "Contrast: $contrast"
@@ -147,6 +168,7 @@ fi
 #Initialization of variables
 dicom_folder=""
 bids_folder=""
+results_folder=""
 participant_id=""
 session_id=""
 contrasts=()
@@ -166,6 +188,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -b)
             bids_folder="$2"
+            shift 2
+            ;;
+        -r)
+            results_folder="$2"
             shift 2
             ;;
         -p)
@@ -200,7 +226,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check whether the required arguments are provided, if not, print the usage and exit
-variables=(dicom_folder bids_folder participant_id session_id contrasts)
+variables=(dicom_folder bids_folder results_folder participant_id session_id contrasts)
 for var in "${variables[@]}"; do
     if [[ -z ${!var} ]]; then
         echo "Error: Missing argument: -${var:0:1} <$var>."
