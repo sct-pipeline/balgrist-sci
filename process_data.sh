@@ -9,6 +9,7 @@
 # Requirements:
 #   - SCT (Spinal Cord Toolbox)
 #   - dcm2niix
+#   - FSLeyes
 #
 # Example usage:
 #     bash process_data.sh \
@@ -93,7 +94,7 @@ activate_env()
 check_dependencies()
 {
     # List of commands to check
-    commands=("dcm2niix" "sct_check_dependencies")
+    commands=("dcm2niix" "sct_check_dependencies" "fsleyes")
 
     echo "Checking dependencies..."
 

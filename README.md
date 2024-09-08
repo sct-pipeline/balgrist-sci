@@ -25,6 +25,7 @@ Steps:
 
 * [Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4): toolbox for processing spinal cord MRI data
 * [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install): tool for converting DICOM images into the NIfTI format
+* FSLeyes
 
 ### 1.2 Installation
 
