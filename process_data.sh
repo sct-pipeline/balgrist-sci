@@ -184,8 +184,12 @@ main_analysis()
     # Create the results folder and copy the images to it
     create_results_folder_and_copy_images
 
-    # Go to subject folder
-    cd "$participant_id"/"$session_id"
+    # Define path to the folder where QC will be stored
+    PATH_QC="${results_folder}"/qc
+    SUBJECT="${participant_id}/${session_id}"
+
+    # Go to subject folder in the results folder
+    cd "${SUBJECT}"
 
     # Loop across contrasts (specified by the '-c' arg)
     for contrast in "${contrasts[@]}"; do
