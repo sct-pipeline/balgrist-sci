@@ -14,6 +14,7 @@ Steps:
   - [1.2 Installation](#12-installation)
     - [SCT Installation](#sct-installation)
     - [dcm2niix Installation](#dcm2niix-installation)
+    - [FSLeyes Installation](#fsleyes-installation)
     - [Downloading this repository](#downloading-this-repository)
 - [2. Data structure](#2-data-structure)
   - [2.1 File organization](#21-file-organization)
@@ -25,7 +26,7 @@ Steps:
 
 * [Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4): toolbox for processing spinal cord MRI data
 * [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install): tool for converting DICOM images into the NIfTI format
-* FSLeyes
+* [FSLeyes](https://owncloud.cesnet.cz/index.php/s/z5h02r0cq0B7ESf): tool for visualizing NIfTI images
 
 ### 1.2 Installation
 
@@ -103,6 +104,36 @@ dcm2niix --version
 ```
 
 The expected output is the version of `dcm2niix`.
+
+</details>
+
+#### FSLeyes Installation
+
+<details><summary>Click the triangle to expand/collapse the section</summary>
+
+1. Open a new terminal (if you closed the previous one):
+
+Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
+
+2. Run the following commands in the terminal (you can copy-paste the whole block):
+
+```bash
+# Go to the SCT directory
+cd $SCT_DIR
+# Activate SCT conda environment
+source ./python/etc/profile.d/conda.sh
+conda activate venv_sct
+# Install fsleyes from conda-forge
+conda install -c conda-forge fsleyes
+```
+
+3. Check that `fsleyes` was installed correctly:
+
+```bash
+fsleyes --version
+```
+
+The expected output is the version of `fsleyes`.
 
 </details>
 
