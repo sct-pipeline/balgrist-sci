@@ -203,26 +203,27 @@ The rest of the directories and files will be created during the processing; see
 │    ├── sub-002            --> folder containing NIfTI files for second subject
 │    │   ├── ...
 │    ├── ...
-├── data_processed          --> folder with processed data  
-│    ├── sub-001            --> folder with processed data for first subject
-│    │   ├── ses-01         --> first session
-│    │   │  ├── anat        --> folder with processed anatomical data
-│    │   │  │  ├── ...
-└── derivatives             --> folder to store visually checked and/or manually corrected data (for example, spinal cord segmentations)
-    └── labels
-        ├── sub-001         --> first subject
-        │   ├── ses-01      --> first session
-        │   │  ├── anat
-        │   │  │  ├── sub-001_ses-01_T2w_label-SC_seg.nii.gz              --> spinal cord (SC) binary segmentation 
-        │   │  │  ├── sub-001_ses-01_T2w_label-compression_label.nii.gz   --> binary compression labeling
-        │   │  │  ├── ...
-        │   │  └── dwi
-        │   │     ├── sub-001_ses-01_dwi_label-SC_seg.nii.gz
-        │   │     ├── ...
-        │   └── ses-02      --> second session
-        │      ├── ...
-        ├── sub-002 
-        └── ...
+│    └── derivatives        --> folder to store visually checked and/or manually corrected data (for example, spinal cord segmentations)
+│        └── labels
+│            ├── sub-001    --> first subject
+│            │   ├── ses-01 --> first session
+│            │   │  ├── anat
+│            │   │  │  ├── sub-001_ses-01_T2w_label-SC_seg.nii.gz              --> spinal cord (SC) binary segmentation
+│            │   │  │  ├── sub-001_ses-01_T2w_label-compression_label.nii.gz   --> binary compression labeling
+│            │   │  │  ├── ...
+│            │   │  └── dwi
+│            │   │     ├── sub-001_ses-01_dwi_label-SC_seg.nii.gz
+│            │   │     ├── ...
+│            │   └── ses-02 --> second session
+│            │      ├── ...
+│            ├── sub-002
+│            └── ...
+└── data_processed          --> folder with processed data  
+     ├── sub-001            --> folder with processed data for first subject
+     │   ├── ses-01         --> first session
+     │   │  ├── anat        --> folder with processed anatomical data
+     │   │  │  ├── ...
+     ...
 ```
 
 `participants.tsv` example:
