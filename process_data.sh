@@ -133,6 +133,32 @@ create_results_folder_and_copy_images()
     rsync -Ravzh "$bids_folder"/./"$participant_id"/"$session_id" .
 }
 
+# Inspiration: https://github.com/spinalcordtoolbox/sct_tutorial_data/blob/master/multi_subject/process_data.sh#L66-L89
+segment_if_does_not_exist() {
+  ###
+  #  This function checks if a manual spinal cord segmentation file already exists, then:
+  #    - If it does, copy it locally.
+  #    - If it doesn't, perform automatic spinal cord segmentation.
+  #  This allows you to add manual segmentations on a subject-by-subject basis without disrupting the pipeline.
+  ###
+  local file="${1}"
+  local contrast="${2}"
+  # Update global variable with segmentation file name
+  FILESEG="${file}"_label-SC_seg
+  FILESEGMANUAL="${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/"${FILESEG}".nii.gz
+  echo
+  echo "Looking for manual segmentation: ${FILESEGMANUAL}"
+  if [[ -e "${FILESEGMANUAL}" ]]; then
+    echo "Found! Using manual segmentation."
+    rsync -avzh "${FILESEGMANUAL}" "${FILESEG}".nii.gz
+    sct_qc -i "${file}".nii.gz -s "${FILESEG}".nii.gz -p sct_deepseg_sc -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
+  else
+    echo "Not found. Proceeding with automatic segmentation."
+    # Segment spinal cord
+    # TODO: consider replacing sct_deepseg_sc by contrast-agnostic or SCIseg as they might work better in compression
+    sct_deepseg_sc -i "${file}".nii.gz -c "${contrast}" -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
+  fi
+}
 
 process_t2w()
 {
@@ -144,9 +170,9 @@ process_t2w()
     file_t2="${participant_id}_${session_id}_${suffix}"
 
     # Segment spinal cord (only if it does not exist)
-    # TODO: add 'segment_sc_if_does_not_exist' function to check for GT under derivatives/labels
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
-    sct_deepseg_sc -i "$file_t2".nii.gz -c t2
+    segment_if_does_not_exist "$file_t2" t2
+    file_t2_seg="${FILESEG}"
 
     # Open FSLEyes to visualize the segmentation
     fsleyes "$file_t2".nii.gz "${file_t2}_seg.nii.gz" -cm red -a 70.0
