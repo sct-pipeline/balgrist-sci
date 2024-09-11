@@ -174,8 +174,14 @@ process_t2w()
     segment_if_does_not_exist "$file_t2" t2
     file_t2_seg="${FILESEG}"
 
-    # Open FSLEyes to visualize the segmentation
-    fsleyes "$file_t2".nii.gz "${file_t2}_seg.nii.gz" -cm red -a 70.0
+    # Open FSLeyes to visualize the segmentation
+    echo "Opening FSLeyes (close FSLeyes to continue)..."
+    fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
+    # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
+    if [ ! -d "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/ ]; then
+        mkdir -p "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
+    fi
+    rsync -avzh "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
     # TODO: continue with the analysis
 }
 
