@@ -50,11 +50,11 @@ MANDATORY ARGUMENTS
   -r <results folder>         Path to the folder where the results will be stored. Example: ~/sci-balgrist-study/data_processed
   -p <participant id>         Participant ID. Example: sub-001
   -s <session id>             Session ID. Example: ses-01
-  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Example: 'T2w dwi'
+  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'T2w' or 'T2w dwi'
 
 OPTIONAL ARGUMENTS
-  -a <age>                  Age of the subject at the time of the MRI scan. Example: 25. Default: n/a
-  -x <sex>                  Sex of the subject. Example: M. Default: n/a
+  -a <age>                  Age of the subject at the time of the MRI scan. The provided value will be stored to participants.tsv file. Example: 25. Default: n/a
+  -x <sex>                  Sex of the subject. The provided value will be stored to participants.tsv file. Example: M. Default: n/a
 EOF
 }
 
