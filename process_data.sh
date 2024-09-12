@@ -119,11 +119,17 @@ convert_dcm2nii()
 
 # Create the results folder (specified by the '-r' arg) and copy the NIfTI images from bids folder (specified by
 # the '-b' arg) to it
+# Also, create a folder under derivatives/labels for the current subject to store visually verified segmentations
 create_results_folder_and_copy_images()
 {
     # Create data_processed folder if it does not exist to store the analysis results
     if [ ! -d "$results_folder" ]; then
         mkdir -p "$results_folder"
+    fi
+
+    # Create a folder under derivatives/labels for the current subject to store visually verified segmentations
+    if [ ! -d "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/ ]; then
+        mkdir -p "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
     fi
 
     # Go to folder where data will be copied and processed
@@ -178,9 +184,6 @@ process_t2w()
     echo "Opening FSLeyes (close FSLeyes to continue)..."
     fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
-    if [ ! -d "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/ ]; then
-        mkdir -p "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
-    fi
     rsync -avzh "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
     # TODO: continue with the analysis
 }
