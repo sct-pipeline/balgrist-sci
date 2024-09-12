@@ -204,11 +204,12 @@ main_analysis()
                 echo "Processing T2w images..."
                 process_t2w $contrast
                 ;;
-            dwi)
-                echo "Processing DWI images..."
-                ;;
+#            dwi)
+#                echo "Processing DWI images..."
+#                ;;
             *)
-                echo "Unknown contrast: $contrast"
+                echo "Analysis for $contrast is not implemented yet :-(. Skipping..."
+#                echo "Unknown contrast: $contrast"
                 ;;
         esac
     done
