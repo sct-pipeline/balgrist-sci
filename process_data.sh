@@ -172,7 +172,7 @@ process_t2w()
     # Go to anat folder where all structural data are located
     cd anat
 
-    # Construct the file name based on the subject ID
+    # Construct the file name based on the subject ID, e.g., sub-001_ses-01_T2w
     file_t2="${participant_id}_${session_id}_${suffix}"
 
     # Segment spinal cord (only if it does not exist)
