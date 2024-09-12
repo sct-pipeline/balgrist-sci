@@ -12,6 +12,12 @@ Requirements:
     - dcm2niix -- see the Installation section in the README.md file
 
 Example usage:
+    # Activate SCT conda environment (assuming that it contains dcm2niix)
+    cd $SCT_DIR
+    source ./python/etc/profile.d/conda.sh
+    conda activate venv_sct
+
+    # Run the script
     python ~/balgrist-sci/file_loader.py \
       -dicom-folder ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
       -bids-folder ~/data/experiments/balgrist-sci/bids \
