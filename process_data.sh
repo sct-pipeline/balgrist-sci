@@ -182,6 +182,7 @@ process_t2w()
 
     # Open FSLeyes to visualize the segmentation
     echo "Opening FSLeyes (close FSLeyes to continue)..."
+    echo "Check the quality of the segmentation, correct the segmentation if necessary, and save it by overwriting the existing file. Then close FSLeyes to continue."
     fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
     rsync -avzh "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
