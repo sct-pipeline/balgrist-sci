@@ -85,7 +85,7 @@ The expected output is `[OK]` for all dependencies.
 
 Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
 
-2. Run the following commands in the terminal (you can copy-paste the whole block):
+Then, activate the SCT conda environment:
 
 ```bash
 # Go to the SCT directory
@@ -93,6 +93,11 @@ cd $SCT_DIR
 # Activate SCT conda environment
 source ./python/etc/profile.d/conda.sh
 conda activate venv_sct
+```
+
+2. Run the following command in the terminal (you can copy-paste the whole block):
+
+```bash
 # Install dcm2niix using pip
 pip install dcm2niix
 ```
@@ -115,7 +120,7 @@ The expected output is the version of `dcm2niix`.
 
 Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
 
-2. Run the following commands in the terminal (you can copy-paste the whole block):
+Then, activate the SCT conda environment:
 
 ```bash
 # Go to the SCT directory
@@ -123,6 +128,11 @@ cd $SCT_DIR
 # Activate SCT conda environment
 source ./python/etc/profile.d/conda.sh
 conda activate venv_sct
+```
+
+2. Run the following command in the terminal (you can copy-paste the whole block):
+
+```bash
 # Install fsleyes from conda-forge
 conda install -c conda-forge fsleyes
 ```
