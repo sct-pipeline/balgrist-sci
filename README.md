@@ -49,7 +49,7 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 # Go to your home directory
 cd ~
 # Download SCT v6.4
-wget https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/6.4.zip
+curl -L -o 6.4.zip https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/6.4.zip
 # Unzip the downloaded file --> the unzipped directory will be named spinalcordtoolbox-6.4
 unzip 6.4.zip
 rm 6.4.zip
@@ -154,7 +154,7 @@ cd ~
 git clone https://github.com/sct-pipeline/balgrist-sci.git balgrist-sci
 ```
 
-TODO: Replace `git clone` by `wget` once we publish a repo release because Apple Developer Tools are needed for `git`.
+TODO: Replace `git clone` by `curl` once we publish a repo release because Apple Developer Tools are needed for `git`.
 
 3. Check that the repository was downloaded correctly:
 
