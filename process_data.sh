@@ -128,8 +128,8 @@ create_results_folder_and_copy_images()
     fi
 
     # Create a folder under derivatives/labels for the current subject to store visually verified segmentations
-    if [ ! -d "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/ ]; then
-        mkdir -p "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
+    if [ ! -d "${bids_folder}"/derivatives/labels/"$participant_id"/"$session_id"/anat/ ]; then
+        mkdir -p "${bids_folder}"/derivatives/labels/"$participant_id"/"$session_id"/anat/
     fi
 
     # Go to folder where data will be copied and processed
