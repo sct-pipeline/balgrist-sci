@@ -386,12 +386,26 @@ def main():
         logging.error(f"Error: Provided folder with DICOM images does not exist: {dicom_folder}")
         exit(1)
 
-    # Check whether the BIDS folder already exists, if so, warn the user and exit
+    # Check whether the BIDS folder already exists, if so, ask user whether to overwrite it
     output_folder = os.path.join(bids_folder, participant_id, session_id)
     if os.path.isdir(output_folder):
-        logging.error(f"Error: BIDS folder for the provided participant and session already exists: {output_folder}"
-                      f"\nPlease remove the existing BIDS folder and rerun the script.")
-        exit(1)
+        logging.info(f"Warning: BIDS folder for the provided participant and session already exists: {output_folder}")
+        while True:
+            user_input = input("Do you want to overwrite the existing folder? [yes/no]: ").lower()
+            if user_input in ['y', 'yes']:
+                logging.info("Overwriting the existing folder.")
+                try:
+                    shutil.rmtree(output_folder)
+                    logging.info(f"Removed existing folder: {output_folder}")
+                except Exception as e:
+                    logging.error(f"Failed to remove existing folder: {e}")
+                    raise
+                break
+            elif user_input in ['n', 'no']:
+                logging.info("Skipping the DICOM to NIfTI conversion.")
+                return False
+            else:
+                logging.info("Warning: Invalid input. Please enter 'yes' or 'no'.")
     else:
         # Create the output folder if it does not exist
         os.makedirs(output_folder, exist_ok=True)
