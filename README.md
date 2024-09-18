@@ -160,7 +160,7 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 ```bash
 # Go to your home directory
 cd ~
-# Download (clone) the repository --> the repository will be downloaded as zip file named balgrist-sci.zip
+# Download the repository --> the repository will be downloaded as zip file named balgrist-sci.zip
 curl -L -o balgrist-sci.zip https://github.com/sct-pipeline/balgrist-sci/archive/refs/tags/r20240918.zip
 # Unzip the downloaded file --> the unzipped directory will be named balgrist-sci-r20240918
 unzip balgrist-sci.zip
@@ -168,8 +168,6 @@ rm balgrist-sci.zip
 # Rename the unzipped directory to balgrist-sci
 mv balgrist-sci-r20240918 balgrist-sci
 ```
-
-TODO: Replace `git clone` by `curl` once we publish a repo release because Apple Developer Tools are needed for `git`.
 
 3. Check that the repository was downloaded correctly:
 
