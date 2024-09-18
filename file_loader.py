@@ -12,6 +12,12 @@ Requirements:
     - dcm2niix -- see the Installation section in the README.md file
 
 Example usage:
+    # Activate SCT conda environment (assuming that it contains dcm2niix)
+    cd $SCT_DIR
+    source ./python/etc/profile.d/conda.sh
+    conda activate venv_sct
+
+    # Run the script
     python ~/balgrist-sci/file_loader.py \
       -dicom-folder ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
       -bids-folder ~/data/experiments/balgrist-sci/bids \
@@ -46,9 +52,9 @@ Output file structure:
             ├── ...
             └── SRe. 1.3.12.2.5432233
 
-Author: Jan Valosek and Claude 3.5 Sonnet
+Author: Jan Valosek
+AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
 """
-
 import os
 import shutil
 import argparse
@@ -104,14 +110,14 @@ def get_parser():
     )
     parser.add_argument(
         "-age",
-        help="Subject's age at the time of the MRI scan. "
+        help="Age of the subject at the time of the MRI scan. "
              "Example: 25. Default: n/a",
         default='n/a',
         required=False
     )
     parser.add_argument(
         "-sex",
-        help="Subject's sex. "
+        help="Sex of the subject. "
              "Example: M. Default: n/a",
         default='n/a',
         choices=['M', 'F', 'n/a'],
@@ -160,7 +166,7 @@ def run_dcm2niix(dicom_folder, temp_folder):
         dicom_folder
     ]
 
-    logging.info("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix.\n")
+    logging.info("\nInfo: Starting DICOM to NIfTI conversion using dcm2niix...\n")
 
     os.system(" ".join(cmd))
 
@@ -177,8 +183,22 @@ def select_image(contrast, nii_info_df, temp_folder):
     # Ask the user to provide a row number (df index) corresponding to the image
     while True:
         time.sleep(0.5)
-        row_number = int(input(f"Please specify the row number (from 0 to {len(nii_info_df)-1}) of the {contrast} "
-                               f"image you want to use: "))
+        logging.info(f"Please specify the row number (from 0 to {len(nii_info_df)-1}) of the {contrast} "
+                     f"image you want to use: ")
+        user_input = input("")
+
+        # Check for empty input
+        if not user_input.strip():
+            logging.info("Warning: Input cannot be empty. Please try again.")
+            continue
+
+        # Check for non-integer input
+        try:
+            row_number = int(user_input)
+        except ValueError:
+            logging.info("Warning: Invalid input. Please enter a valid row number.")
+            continue
+
         if row_number < 0 or row_number >= len(nii_info_df):
             logging.info("Warning: Invalid image number. Please try again.")
             continue
@@ -265,6 +285,7 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
     :param output_folder: temporary folder with the converted nii images
     :param participant_id: participant ID, e.g., sub-001
     :param session_id: session ID, e.g., ses-01
+    :return: Path to the copied image in the BIDS folder
     """
     # First, create anat and dwi subfolders if they do not exist
     if contrast == "dwi":
@@ -283,6 +304,8 @@ def copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, se
     if contrast == "dwi":
         shutil.copy(fname.replace('.nii.gz', '.bval'), fname_output.replace('.nii.gz', '.bval'))
         shutil.copy(fname.replace('.nii.gz', '.bvec'), fname_output.replace('.nii.gz', '.bvec'))
+
+    return fname_output
 
 
 def write_participants_tsv(bids_folder, participant_id, session_id, source_id, age=None, sex=None):
@@ -315,7 +338,7 @@ def write_participants_tsv(bids_folder, participant_id, session_id, source_id, a
             age if age is not None else 'n/a',
             sex if sex is not None else 'n/a'
         ])
-        logging.info(f"Added entry for {participant_id}/{session_id} to participants.tsv")
+        logging.info(f"Info: Added entry for {participant_id}/{session_id} to participants.tsv")
 
 
 def main():
@@ -346,24 +369,43 @@ def main():
     )
 
     logging.info(100*"-")
+    logging.info(f'Starting DICOM to NIfTI conversion using the script: {os.path.abspath(__file__)}')
+    logging.info(100*"-")
     logging.info(f'Dicom folder: {dicom_folder}')
     logging.info(f'BIDS folder: {bids_folder}')
     logging.info(f'Participant ID: {participant_id}')
     logging.info(f'Session ID: {session_id}')
-    logging.info(f"Log file will be stored in: {log_filepath}")
+    logging.info(f'MRI contrasts to use: {contrasts}')
+    logging.info(f'Age: {args.age}')
+    logging.info(f'Sex: {args.sex}')
     logging.info(100*"-")
+    logging.info(f"Log file will be stored in: {log_filepath}")
 
     # Check if the folder with DICOMs exists
     if not os.path.isdir(dicom_folder):
         logging.error(f"Error: Provided folder with DICOM images does not exist: {dicom_folder}")
         exit(1)
 
-    # Check whether the BIDS folder already exists, if so, warn the user and exit
+    # Check whether the BIDS folder already exists, if so, ask user whether to overwrite it
     output_folder = os.path.join(bids_folder, participant_id, session_id)
     if os.path.isdir(output_folder):
-        logging.error(f"Error: BIDS folder for the provided participant and session already exists: {output_folder}"
-                      f"\nPlease remove the existing BIDS folder and rerun the script.")
-        exit(1)
+        logging.info(f"Warning: BIDS folder for the provided participant and session already exists: {output_folder}")
+        while True:
+            user_input = input("Do you want to overwrite the existing folder? [yes/no]: ").lower()
+            if user_input in ['y', 'yes']:
+                logging.info("Overwriting the existing folder.")
+                try:
+                    shutil.rmtree(output_folder)
+                    logging.info(f"Removed existing folder: {output_folder}")
+                except Exception as e:
+                    logging.error(f"Failed to remove existing folder: {e}")
+                    raise
+                break
+            elif user_input in ['n', 'no']:
+                logging.info("Skipping the DICOM to NIfTI conversion.")
+                return False
+            else:
+                logging.info("Warning: Invalid input. Please enter 'yes' or 'no'.")
     else:
         # Create the output folder if it does not exist
         os.makedirs(output_folder, exist_ok=True)
@@ -393,9 +435,11 @@ def main():
         images_to_use_dict[contrast] = select_image(contrast, nii_info_df, temp_folder)
 
     # Copy the files to the BIDS folder
+    images_bids_dict = dict()
     logging.info('')
     for contrast, fname in images_to_use_dict.items():
-        copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
+        image_bids = copy_files_to_bids_folder(contrast, fname, output_folder, participant_id, session_id)
+        images_bids_dict[contrast] = image_bids
 
     if args.debug:
         logging.info(f"\nInfo: Temporary folder with NIfTI images is stored in: {temp_folder}")
@@ -405,7 +449,7 @@ def main():
         shutil.rmtree(temp_folder)
 
     logging.info(100*"-")
-    logging.info("All files have been successfully converted and validated. You can find the following images in the "
+    logging.info("All files have been successfully converted and validated. You can find the images in the "
                  "BIDS folder:")
     logging.info(f"\t{output_folder}")
     logging.info(100*"-")
@@ -413,6 +457,10 @@ def main():
     # Add call to write_participants_tsv
     source_id = os.path.basename(os.path.normpath(dicom_folder))
     write_participants_tsv(bids_folder, participant_id, session_id, source_id, args.age, args.sex)
+
+    logging.info(100 * "-")
+    logging.info(f'{os.path.abspath(__file__)} finished successfully.')
+    logging.info(100 * "-")
 
 
 if __name__ == "__main__":

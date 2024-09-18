@@ -14,10 +14,11 @@ Steps:
   - [1.2 Installation](#12-installation)
     - [SCT Installation](#sct-installation)
     - [dcm2niix Installation](#dcm2niix-installation)
+    - [FSLeyes Installation](#fsleyes-installation)
     - [Downloading this repository](#downloading-this-repository)
 - [2. Data structure](#2-data-structure)
   - [2.1 File organization](#21-file-organization)
-  - [2.2 DICOM to NIfTI conversion](#22-dicom-to-nifti-conversion)
+- [3. Analysis pipeline](#3-analysis-pipeline)
 
 ## 1. Getting Started
 
@@ -25,6 +26,7 @@ Steps:
 
 * [Spinal Cord Toolbox v6.4](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.4): toolbox for processing spinal cord MRI data
 * [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install): tool for converting DICOM images into the NIfTI format
+* [FSLeyes](https://owncloud.cesnet.cz/index.php/s/z5h02r0cq0B7ESf): tool for visualizing NIfTI images
 
 ### 1.2 Installation
 
@@ -47,7 +49,7 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 # Go to your home directory
 cd ~
 # Download SCT v6.4
-wget https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/6.4.zip
+curl -L -o 6.4.zip https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/6.4.zip
 # Unzip the downloaded file --> the unzipped directory will be named spinalcordtoolbox-6.4
 unzip 6.4.zip
 rm 6.4.zip
@@ -83,7 +85,7 @@ The expected output is `[OK]` for all dependencies.
 
 Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
 
-2. Run the following commands in the terminal (you can copy-paste the whole block):
+Then, activate the SCT conda environment:
 
 ```bash
 # Go to the SCT directory
@@ -91,6 +93,11 @@ cd $SCT_DIR
 # Activate SCT conda environment
 source ./python/etc/profile.d/conda.sh
 conda activate venv_sct
+```
+
+2. Run the following command in the terminal (you can copy-paste the whole block):
+
+```bash
 # Install dcm2niix using pip
 pip install dcm2niix
 ```
@@ -102,6 +109,41 @@ dcm2niix --version
 ```
 
 The expected output is the version of `dcm2niix`.
+
+</details>
+
+#### FSLeyes Installation
+
+<details><summary>Click the triangle to expand/collapse the section</summary>
+
+1. Open a new terminal (if you closed the previous one):
+
+Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>return/enter</kbd>.
+
+Then, activate the SCT conda environment:
+
+```bash
+# Go to the SCT directory
+cd $SCT_DIR
+# Activate SCT conda environment
+source ./python/etc/profile.d/conda.sh
+conda activate venv_sct
+```
+
+2. Run the following command in the terminal (you can copy-paste the whole block):
+
+```bash
+# Install fsleyes from conda-forge
+conda install -c conda-forge fsleyes
+```
+
+3. Check that `fsleyes` was installed correctly:
+
+```bash
+fsleyes --version
+```
+
+The expected output is the version of `fsleyes`.
 
 </details>
 
@@ -122,7 +164,7 @@ cd ~
 git clone https://github.com/sct-pipeline/balgrist-sci.git balgrist-sci
 ```
 
-TODO: Replace `git clone` by `wget` once we publish a repo release because Apple Developer Tools are needed for `git`.
+TODO: Replace `git clone` by `curl` once we publish a repo release because Apple Developer Tools are needed for `git`.
 
 3. Check that the repository was downloaded correctly:
 
@@ -171,26 +213,27 @@ The rest of the directories and files will be created during the processing; see
 │    ├── sub-002            --> folder containing NIfTI files for second subject
 │    │   ├── ...
 │    ├── ...
-├── data_processed          --> folder with processed data  
-│    ├── sub-001            --> folder with processed data for first subject
-│    │   ├── ses-01         --> first session
-│    │   │  ├── anat        --> folder with processed anatomical data
-│    │   │  │  ├── ...
-└── derivatives             --> folder to store visually checked and/or manually corrected data (for example, spinal cord segmentations)
-    └── labels
-        ├── sub-001         --> first subject
-        │   ├── ses-01      --> first session
-        │   │  ├── anat
-        │   │  │  ├── sub-001_ses-01_T2w_label-SC_seg.nii.gz              --> spinal cord (SC) binary segmentation 
-        │   │  │  ├── sub-001_ses-01_T2w_label-compression_label.nii.gz   --> binary compression labeling
-        │   │  │  ├── ...
-        │   │  └── dwi
-        │   │     ├── sub-001_ses-01_dwi_label-SC_seg.nii.gz
-        │   │     ├── ...
-        │   └── ses-02      --> second session
-        │      ├── ...
-        ├── sub-002 
-        └── ...
+│    └── derivatives        --> folder to store visually checked and/or manually corrected data (for example, spinal cord segmentations)
+│        └── labels
+│            ├── sub-001    --> first subject
+│            │   ├── ses-01 --> first session
+│            │   │  ├── anat
+│            │   │  │  ├── sub-001_ses-01_T2w_label-SC_seg.nii.gz              --> spinal cord (SC) binary segmentation
+│            │   │  │  ├── sub-001_ses-01_T2w_label-compression_label.nii.gz   --> binary compression labeling
+│            │   │  │  ├── ...
+│            │   │  └── dwi
+│            │   │     ├── sub-001_ses-01_dwi_label-SC_seg.nii.gz
+│            │   │     ├── ...
+│            │   └── ses-02 --> second session
+│            │      ├── ...
+│            ├── sub-002
+│            └── ...
+└── data_processed          --> folder with processed data  
+     ├── sub-001            --> folder with processed data for first subject
+     │   ├── ses-01         --> first session
+     │   │  ├── anat        --> folder with processed anatomical data
+     │   │  │  ├── ...
+     ...
 ```
 
 `participants.tsv` example:
@@ -205,23 +248,43 @@ The rest of the directories and files will be created during the processing; see
 
 </details>
 
-### 2.2 DICOM to NIfTI conversion
+## 3. Analysis pipeline
 
-A single subject DICOM images can be converted to NIfTI and organized according to the BIDS standard using 
-the `file_loader.py` script.
+The whole analysis pipeline is implemented in the `process_data.sh` script.
 
-Example usage:
+The script first converts DICOM files to NIfTI (BIDS) format using `dcm2niix`. 
+Then, it processes the data using SCT functions. After running the SCT functions, the script opens FSLeyes to allow the 
+user to visually check the results. 
+
+Usage:
 
 ```bash
-# Activate SCT conda environment
-cd $SCT_DIR
-source ./python/etc/profile.d/conda.sh
-conda activate venv_sct
-# Run the script
-python ~/balgrist-sci/file_loader.py \
-  -dicom-folder ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
-  -bids-folder ~/data/experiments/balgrist-sci/bids \ 
-  -participant sub-001 \
-  -session ses-01 \
-  -contrasts T2w dwi
+./process_data.sh -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
+```
+
+MANDATORY ARGUMENTS
+  -d <dicom folder>           Path to the folder containing DICOM images. Example: ~/sci-balgrist-study/sourcedata/dir_20230711
+  -b <bids folder>            Path to the BIDS folder where the converted NIfTI images will be stored. Example: ~/sci-balgrist-study/bids
+  -r <results folder>         Path to the folder where the results will be stored. Example: ~/sci-balgrist-study/data_processed
+  -p <participant id>         Participant ID. Example: sub-001
+  -s <session id>             Session ID. Example: ses-01
+  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'T2w' or 'T2w dwi'
+
+OPTIONAL ARGUMENTS
+  -a <age>                  Age of the subject at the time of the MRI scan. The provided value will be stored to participants.tsv file. Example: 25. Default: n/a
+  -x <sex>                  Sex of the subject. The provided value will be stored to participants.tsv file. Example: M. Default: n/a
+
+
+Example:
+
+```bash
+bash process_data.sh \
+  -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
+  -b ~/data/experiments/balgrist-sci/bids \
+  -r ~/data/experiments/balgrist-sci/data_processed \
+  -p sub-001 \
+  -s ses-01 \
+  -c T2w dwi \
+  -a 30 \
+  -x M
 ```
