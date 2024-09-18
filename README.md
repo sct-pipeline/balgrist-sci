@@ -160,8 +160,13 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 ```bash
 # Go to your home directory
 cd ~
-# Download (clone) the repository --> the repository will be downloaded to a directory named balgrist-sci
-git clone https://github.com/sct-pipeline/balgrist-sci.git balgrist-sci
+# Download (clone) the repository --> the repository will be downloaded as zip file named balgrist-sci.zip
+curl -L -o balgrist-sci.zip https://github.com/sct-pipeline/balgrist-sci/archive/refs/tags/r20240918.zip
+# Unzip the downloaded file --> the unzipped directory will be named balgrist-sci-r20240918
+unzip balgrist-sci.zip
+rm balgrist-sci.zip
+# Rename the unzipped directory to balgrist-sci
+mv balgrist-sci-r20240918 balgrist-sci
 ```
 
 TODO: Replace `git clone` by `curl` once we publish a repo release because Apple Developer Tools are needed for `git`.
@@ -175,6 +180,8 @@ conda activate venv_sct
 # Call the help of the file_loader.py script
 python ~/balgrist-sci/file_loader.py --help
 ```
+
+The expected output is the help message of the `file_loader.py` script.
 
 </details>
 
