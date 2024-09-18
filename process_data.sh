@@ -109,6 +109,21 @@ check_dependencies()
     done
 }
 
+# Echo a message with line breaks before and after
+echo_with_linebreaks()
+{
+    local message=$1
+    local line=$(printf -- '-%.0s' {1..100})
+    echo "${line}"
+    echo -e "${message}"
+    echo "${line}"
+}
+
+echo_fsleyes_instructions()
+{
+    echo_with_linebreaks "Opening FSLeyes (close FSLeyes to continue)...\nCheck the quality of the segmentation, correct the segmentation if necessary, and save it by overwriting the existing file. Then close FSLeyes to continue."
+}
+
 # Convert DICOM files to NIfTI format using the file_loader.py script, which calls the dcm2niix function
 convert_dcm2nii()
 {
@@ -180,8 +195,7 @@ process_t2w()
     file_t2_seg="${FILESEG}"
 
     # Open FSLeyes to visualize the segmentation
-    echo "Opening FSLeyes (close FSLeyes to continue)..."
-    echo "Check the quality of the segmentation, correct the segmentation if necessary, and save it by overwriting the existing file. Then close FSLeyes to continue."
+    echo_fsleyes_instructions
     fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
     rsync -avzh "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
@@ -204,7 +218,7 @@ main_analysis()
     for contrast in "${contrasts[@]}"; do
         case $contrast in
             T2w)
-                echo "Processing T2w images..."
+                echo_with_linebreaks "Processing T2w image..."
                 process_t2w $contrast
                 ;;
 #            dwi)
