@@ -262,6 +262,7 @@ Usage:
 ./process_data.sh -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
 ```
 
+```
 MANDATORY ARGUMENTS
   -d <dicom folder>           Path to the folder containing DICOM images. Example: ~/sci-balgrist-study/sourcedata/dir_20230711
   -b <bids folder>            Path to the BIDS folder where the converted NIfTI images will be stored. Example: ~/sci-balgrist-study/bids
@@ -273,7 +274,7 @@ MANDATORY ARGUMENTS
 OPTIONAL ARGUMENTS
   -a <age>                  Age of the subject at the time of the MRI scan. The provided value will be stored to participants.tsv file. Example: 25. Default: n/a
   -x <sex>                  Sex of the subject. The provided value will be stored to participants.tsv file. Example: M. Default: n/a
-
+```
 
 Example:
 
