@@ -161,8 +161,7 @@ segment_if_does_not_exist() {
   else
     echo "Not found. Proceeding with automatic segmentation."
     # Segment spinal cord
-    # TODO: consider replacing sct_deepseg_sc by contrast-agnostic or SCIseg as they might work better in compression
-    sct_deepseg_sc -i "${file}".nii.gz -c "${contrast}" -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
+    sct_deepseg -i "${file}".nii.gz -task seg_sc_contrast_agnostic -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
   fi
 }
 
