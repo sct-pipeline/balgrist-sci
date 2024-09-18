@@ -6,7 +6,7 @@ Steps:
 1. DICOM to NIfTI (BIDS) conversion
 2. Processing (spinal cord and lesion segmentation, vertebral labeling)
 3. Quality control (QC) + manual compression level labeling
-4. Lesion metric computation
+4. Lesion metric computation -- not implemented yet
 
 ## Table of contents
 - [1. Getting Started](#1-getting-started)
@@ -250,7 +250,7 @@ The rest of the directories and files will be created during the processing; see
 
 ## 3. Analysis pipeline
 
-The whole analysis pipeline is implemented in the `process_data.sh` script.
+The entire analysis pipeline is orchestrated by the `process_data.sh` script.
 
 The script first converts DICOM files to NIfTI (BIDS) format using `dcm2niix`. 
 Then, it processes the data using SCT functions. After running the SCT functions, the script opens FSLeyes to allow the 
