@@ -26,6 +26,7 @@
 # AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
 #
 
+SCRIPT_NAME=$(basename "${0}")
 
 # Immediately exit if error
 set -e -o pipefail
@@ -42,7 +43,7 @@ DESCRIPTION
   Requires that SCT, dcm2niix, and FSLeyes to be installed.
 
 USAGE
-  `basename ${0}` -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
+  ${SCRIPT_NAME} -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
 
 MANDATORY ARGUMENTS
   -d <dicom folder>           Path to the folder containing DICOM images. Example: ~/sci-balgrist-study/sourcedata/dir_20230711
@@ -63,6 +64,9 @@ main()
 {
     # Get the directory of the current script
     get_repo_dir
+
+    echo_with_linebreaks "Starting the main analysis using the script: ${REPO_DIR}/${SCRIPT_NAME}"
+
     # Activate the SCT conda environment with dcm2niix installed
     activate_env
 
@@ -71,7 +75,7 @@ main()
     main_analysis
 
     conda deactivate
-    echo "Done."
+    echo_with_linebreaks "${REPO_DIR}/${SCRIPT_NAME} finished successfully."
 }
 
 # Get the directory of the current script
@@ -234,7 +238,7 @@ main_analysis()
 
 # Print usage if no arguments are provided
 if [ ! ${#@} -gt 0 ]; then
-    usage `basename ${0}`
+    usage ${SCRIPT_NAME}
     exit 1
 fi
 
@@ -303,7 +307,7 @@ variables=(dicom_folder bids_folder results_folder participant_id session_id con
 for var in "${variables[@]}"; do
     if [[ -z ${!var} ]]; then
         echo "Error: Missing argument: -${var:0:1} <$var>."
-        echo "To print the usage, run: `basename ${0}` -h"
+        echo "To print the usage, run: ${SCRIPT_NAME} -h"
         exit 1
     fi
 done
