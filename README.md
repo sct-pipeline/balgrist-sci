@@ -161,12 +161,12 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 # Go to your home directory
 cd ~
 # Download the repository --> the repository will be downloaded as zip file named balgrist-sci.zip
-curl -L -o balgrist-sci.zip https://github.com/sct-pipeline/balgrist-sci/archive/refs/tags/r20240918.zip
-# Unzip the downloaded file --> the unzipped directory will be named balgrist-sci-r20240918
+curl -L -o balgrist-sci.zip https://github.com/sct-pipeline/balgrist-sci/archive/refs/tags/r20241119.zip
+# Unzip the downloaded file --> the unzipped directory will be named balgrist-sci-r20241119
 unzip balgrist-sci.zip
 rm balgrist-sci.zip
 # Rename the unzipped directory to balgrist-sci
-mv balgrist-sci-r20240918 balgrist-sci
+mv balgrist-sci-r20241119 balgrist-sci
 # Make the process_data.sh script executable
 cd balgrist-sci
 chmod u+x process_data.sh
