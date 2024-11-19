@@ -167,6 +167,9 @@ unzip balgrist-sci.zip
 rm balgrist-sci.zip
 # Rename the unzipped directory to balgrist-sci
 mv balgrist-sci-r20240918 balgrist-sci
+# Make the process_data.sh script executable
+cd balgrist-sci
+chmod u+x process_data.sh
 ```
 
 3. Check that the repository was downloaded correctly:

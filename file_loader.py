@@ -347,8 +347,8 @@ def main():
     """
     args = get_parser()
 
-    dicom_folder = os.path.expanduser(args.dicom_folder)
-    bids_folder = os.path.expanduser(args.bids_folder)
+    dicom_folder = os.path.abspath(os.path.expanduser(args.dicom_folder))
+    bids_folder = os.path.abspath(os.path.expanduser(args.bids_folder))
     participant_id = args.participant
     session_id = args.session
     contrasts = args.contrasts
