@@ -413,7 +413,7 @@ def main():
 
     # Create a temporary folder to store dcm2niix output before renaming the files
     temp_folder = os.path.join(output_folder, "temp_dcm2niix")
-    logging.info(f"Creating a temporary folder for dcm2niix conversion: {temp_folder}")
+    logging.info(f"Creating a temporary folder for DICOM to NIfTI conversion: {temp_folder}")
     os.makedirs(temp_folder, exist_ok=True)
     # Run DICOM to NIfTI conversion using the dcm2niix command
     run_dcm2niix(dicom_folder, temp_folder)
