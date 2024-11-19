@@ -154,8 +154,7 @@ create_results_folder_and_copy_images()
     # Go to folder where data will be copied and processed
     cd "$results_folder"
     # Copy source images
-    # Note: we use '/./' in order to include the sub-folder 'ses-0X'
-    rsync -Ravzh "$bids_folder"/./"$participant_id"/"$session_id" .
+    cp -r "$bids_folder"/"$participant_id"/"$session_id" .
 }
 
 # Inspiration: https://github.com/spinalcordtoolbox/sct_tutorial_data/blob/master/multi_subject/process_data.sh#L66-L89
@@ -175,7 +174,7 @@ segment_if_does_not_exist() {
   echo "Looking for manual segmentation: ${FILESEGMANUAL}"
   if [[ -e "${FILESEGMANUAL}" ]]; then
     echo "Found! Using manual segmentation."
-    rsync -avzh "${FILESEGMANUAL}" "${FILESEG}".nii.gz
+    cp "${FILESEGMANUAL}" "${FILESEG}".nii.gz
     sct_qc -i "${file}".nii.gz -s "${FILESEG}".nii.gz -p sct_deepseg_sc -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
   else
     echo "Not found. Proceeding with automatic segmentation."
@@ -202,7 +201,7 @@ process_t2w()
     echo_fsleyes_instructions
     fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
-    rsync -avzh "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
+    cp "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
     # TODO: continue with the analysis
 }
 
