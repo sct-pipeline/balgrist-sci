@@ -203,6 +203,7 @@ process_t2w()
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
     cp "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
     # TODO: continue with the analysis
+    echo -e "Spinal cord segmentation saved as:\n${bids_folder}/derivatives/labels/${SUBJECT}/anat/${file_t2_seg}.nii.gz"
 }
 
 main_analysis()
