@@ -125,7 +125,7 @@ echo_with_linebreaks()
 
 echo_fsleyes_instructions()
 {
-    echo_with_linebreaks "Opening FSLeyes (close FSLeyes to continue)...\nCheck the quality of the segmentation, correct the segmentation if necessary, and save it by overwriting the existing file. Then close FSLeyes to continue."
+    echo_with_linebreaks "Opening FSLeyes (close FSLeyes to continue)...\nCheck the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),\nand save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').\nThen close FSLeyes to continue."
 }
 
 # Convert DICOM files to NIfTI format using the file_loader.py script, which calls the dcm2niix function
