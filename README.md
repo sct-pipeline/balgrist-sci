@@ -264,7 +264,7 @@ user to visually check the results.
 Usage:
 
 ```bash
-./process_data.sh -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
+bash process_data.sh -d <dicom folder> -b <bids folder> -r <results folder> -p <participant id> -s <session id> -c <contrasts> [-age <age> -sex <sex>]
 ```
 
 ```
