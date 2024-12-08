@@ -411,6 +411,7 @@ def main():
                 break
             elif user_input in ['n', 'no']:
                 logging.info("Skipping the DICOM to NIfTI conversion.")
+                print_script_finished()
                 return False
             else:
                 logging.info("Warning: Invalid input. Please enter 'yes' or 'no'.")
@@ -466,9 +467,7 @@ def main():
     source_id = os.path.basename(os.path.normpath(dicom_folder))
     write_participants_tsv(bids_folder, participant_id, session_id, source_id, args.age, args.sex)
 
-    logging.info(100 * "-")
-    logging.info(f'{os.path.abspath(__file__)} finished successfully.')
-    logging.info(100 * "-")
+    print_script_finished()
 
 
 if __name__ == "__main__":
