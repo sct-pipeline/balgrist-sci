@@ -154,7 +154,10 @@ create_results_folder_and_copy_images()
     # Go to folder where data will be copied and processed
     cd "$results_folder"
     # Copy source images
-    cp -r "$bids_folder"/"$participant_id"/"$session_id" .
+    mkdir -p "$participant_id"
+    cp -r "$bids_folder/$participant_id/$session_id" "$participant_id/"
+    # Note: We need to create "$participant_id" first, to preserve the directory structure (e.g., sub-001/ses-01) when
+    # copying the files. Otherwise, only ses-01 folder would be copied to the results folder.
 }
 
 # Inspiration: https://github.com/spinalcordtoolbox/sct_tutorial_data/blob/master/multi_subject/process_data.sh#L66-L89
