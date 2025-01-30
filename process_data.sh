@@ -172,12 +172,13 @@ segment_if_does_not_exist() {
   local contrast="${2}"
   # Update global variable with segmentation file name
   FILESEG="${file}"_label-SC_seg
-  FILESEGMANUAL="${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/"${FILESEG}".nii.gz
+  FILESEGMANUAL="${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/"${FILESEG}"
   echo
-  echo "Looking for manual segmentation: ${FILESEGMANUAL}"
-  if [[ -e "${FILESEGMANUAL}" ]]; then
+  echo "Looking for manual segmentation: ${FILESEGMANUAL}.nii.gz"
+  if [[ -e "${FILESEGMANUAL}".nii.gz ]]; then
     echo "Found! Using manual segmentation."
-    cp "${FILESEGMANUAL}" "${FILESEG}".nii.gz
+    cp "${FILESEGMANUAL}".nii.gz "${FILESEG}".nii.gz
+    cp "${FILESEGMANUAL}".json "${FILESEG}".json
     sct_qc -i "${file}".nii.gz -s "${FILESEG}".nii.gz -p sct_deepseg_sc -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
   else
     echo "Not found. Proceeding with automatic segmentation."
