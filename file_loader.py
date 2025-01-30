@@ -56,6 +56,7 @@ Author: Jan Valosek
 AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
 """
 import os
+import re
 import shutil
 import argparse
 import pandas as pd
@@ -240,6 +241,52 @@ def get_nii_info_dataframe(temp_folder):
     :param temp_folder: Path to the temporary folder with NIfTI images
     :return: DataFrame with image information
     """
+    def _fetch_contrast(nii_file):
+        """
+        Extracts the MRI contrast from the NIfTI filename (created by dcm2niix)
+
+        :param nii_file: Name of the NIfTI file (string)
+        :return: Extracted contrast type (string) or 'unknown' if not found
+        """
+        contrast_mapping = {
+            "t1": "T1w",
+            "t2": "T2w",
+            "flair": "FLAIR",
+            "dwi": "dwi",
+            "pd": "PD",
+            "t2star": "T2star"
+        }
+        # Extract main contrast keyword using regex (e.g., "t1", "t2", etc.)
+        match = re.search(r"(t1|t2|flair|dwi|pd|t2star)", nii_file, re.IGNORECASE)
+
+        if match:
+            contrast_key = match.group(1).lower()
+            return contrast_mapping.get(contrast_key, "unknown")
+
+        return "unknown"
+
+    def _fetch_orientation(nii_file):
+        """
+        Extracts the orientation (e.g., axial, sagittal, coronal) from the NIfTI filename (created by dcm2niix)
+
+        :param nii_file: Name of the NIfTI file (string)
+        :return: Extracted orientation (string) or 'unknown' if not found
+        """
+        orientation_mapping = {
+            "ax": "axial",
+            "tra": "axial",  # 'tra' also represents axial
+            "sag": "sagittal",
+            "cor": "coronal"
+        }
+        # Extract main orientation keyword using regex
+        match = re.search(r"(ax|tra|sag|cor)", nii_file, re.IGNORECASE)
+
+        if match:
+            orientation_key = match.group(1).lower()
+            return orientation_mapping.get(orientation_key, "unknown")
+
+        return "unknown"
+
     # Get all nii files in the temporary folder
     nii_files = [f for f in os.listdir(temp_folder) if f.endswith('.nii.gz')]
 
@@ -253,6 +300,8 @@ def get_nii_info_dataframe(temp_folder):
 
     # Create lists to store the information
     file_names = []
+    contrast_list = []
+    orientation_list = []
     dimensions_list = []
     pixel_sizes = []
 
@@ -262,12 +311,16 @@ def get_nii_info_dataframe(temp_folder):
         dimensions, pixel_size = get_image_info(nii_path)
 
         file_names.append(nii_file)
+        contrast_list.append(_fetch_contrast(nii_file))
+        orientation_list.append(_fetch_orientation(nii_file))
         dimensions_list.append(dimensions)
         pixel_sizes.append(pixel_size)
 
     # Create a DataFrame
     df = pd.DataFrame({
         'File Name': file_names,
+        'Contrast': contrast_list,
+        'Orienation': orientation_list,
         'Dimensions': dimensions_list,
         'Pixel Size [mm]': pixel_sizes
     })
