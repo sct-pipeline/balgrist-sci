@@ -209,6 +209,24 @@ process_t2w_ax()
     echo -e "Spinal cord segmentation saved as:\n${bids_folder}/derivatives/labels/${SUBJECT}/anat/${file_t2_seg}.nii.gz"
 }
 
+process_t2w_sag()
+{
+    local suffix=$1
+    # Go to anat folder where all structural data are located
+    cd anat
+
+    # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-sag_T2w
+    file_t2="${participant_id}_${session_id}_${suffix}"
+
+    # Segment spinal cord (only if it does not exist)
+    # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
+    segment_if_does_not_exist "$file_t2" t2
+    file_t2_seg="${FILESEG}"
+
+    # Go back to the subject root folder
+    cd ..
+}
+
 main_analysis()
 {
     # Create the results folder and copy the images to it
@@ -228,9 +246,10 @@ main_analysis()
                 echo_with_linebreaks "Processing T2w axial image..."
                 process_t2w_ax $contrast
                 ;;
-#            dwi)
-#                echo "Processing DWI images..."
-#                ;;
+            acq-sag_T2w)
+                echo_with_linebreaks "Processing T2w sagittal image..."
+                process_t2w_sag $contrast
+                ;;
             *)
                 echo "Analysis for $contrast is not implemented yet :-(. Skipping..."
 #                echo "Unknown contrast: $contrast"
