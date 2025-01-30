@@ -183,6 +183,17 @@ segment_if_does_not_exist() {
     echo "Not found. Proceeding with automatic segmentation."
     # Segment spinal cord
     sct_deepseg -i "${file}".nii.gz -task seg_sc_contrast_agnostic -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
+
+    # Open FSLeyes to visualize the segmentation
+    echo_fsleyes_instructions
+    fsleyes "$file_t2".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
+    # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
+    cp "${FILESEG}".nii.gz "${FILESEGMANUAL}".nii.gz
+    # TODO: add an entry who QCed and corrected the segmentation to the JSON sidecar
+    cp "${FILESEG}".json "${FILESEGMANUAL}".json
+
+    echo -e "Spinal cord segmentation saved as:\n"${FILESEGMANUAL}".nii.gz"
+
   fi
 }
 
@@ -200,13 +211,8 @@ process_t2w_ax()
     segment_if_does_not_exist "$file_t2" t2
     file_t2_seg="${FILESEG}"
 
-    # Open FSLeyes to visualize the segmentation
-    echo_fsleyes_instructions
-    fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
-    # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
-    cp "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
-    # TODO: continue with the analysis
-    echo -e "Spinal cord segmentation saved as:\n${bids_folder}/derivatives/labels/${SUBJECT}/anat/${file_t2_seg}.nii.gz"
+    # Go back to the subject root folder
+    cd ..
 }
 
 process_t2w_sag()
