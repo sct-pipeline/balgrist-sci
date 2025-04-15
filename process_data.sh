@@ -291,6 +291,7 @@ main_analysis()
     cd "${SUBJECT}"
 
     # Loop across contrasts (specified by the '-c' arg)
+    # TODO: the order the contrasts are processed is determined by the order they are specified in the command line
     for contrast in "${contrasts[@]}"; do
         case $contrast in
             acq-sag_T2w)
