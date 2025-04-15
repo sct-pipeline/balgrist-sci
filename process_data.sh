@@ -293,13 +293,13 @@ main_analysis()
     # Loop across contrasts (specified by the '-c' arg)
     for contrast in "${contrasts[@]}"; do
         case $contrast in
-            acq-ax_T2w)
-                echo_with_linebreaks "Processing T2w axial image..."
-                process_t2w_ax $contrast
-                ;;
             acq-sag_T2w)
                 echo_with_linebreaks "Processing T2w sagittal image..."
                 process_t2w_sag $contrast
+                ;;
+            acq-ax_T2w)
+                echo_with_linebreaks "Processing T2w axial image..."
+                process_t2w_ax $contrast
                 ;;
             *)
                 echo "Analysis for $contrast is not implemented yet :-(. Skipping..."
