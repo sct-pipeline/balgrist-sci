@@ -277,7 +277,7 @@ MANDATORY ARGUMENTS
   -r <results folder>         Path to the folder where the results will be stored. Example: ~/sci-balgrist-study/data_processed
   -p <participant id>         Participant ID. Example: sub-001
   -s <session id>             Session ID. Example: ses-01
-  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'T2w' or 'T2w dwi'
+  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'acq-ax_T2w' or 'acq-sag_T2w'
 
 OPTIONAL ARGUMENTS
   -a <age>                  Age of the subject at the time of the MRI scan. The provided value will be stored to participants.tsv file. Example: 25. Default: n/a
@@ -293,7 +293,7 @@ bash process_data.sh \
   -r ~/data/experiments/balgrist-sci/data_processed \
   -p sub-001 \
   -s ses-01 \
-  -c T2w dwi \
+  -c acq-ax_T2w acq-sag_T2w \
   -a 30 \
   -x M
 ```
