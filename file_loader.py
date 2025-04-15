@@ -320,7 +320,7 @@ def get_nii_info_dataframe(temp_folder):
     df = pd.DataFrame({
         'File Name': file_names,
         'Contrast': contrast_list,
-        'Orienation': orientation_list,
+        'Orientation': orientation_list,
         'Dimensions': dimensions_list,
         'Pixel Size [mm]': pixel_sizes
     })
