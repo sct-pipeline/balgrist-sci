@@ -11,16 +11,21 @@
 #   - dcm2niix
 #   - FSLeyes
 #
-# Example usage:
-#     bash process_data.sh \
-#       -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
-#       -b ~/data/experiments/balgrist-sci/bids \
-#       -r ~/data/experiments/balgrist-sci/data_processed \
-#       -p sub-001 \
-#       -s ses-01 \
-#       -c acq-ax_T2w acq-sag_T2w \
-#       -a 30 \
-#       -x M
+# Usage:
+#   1. Activate the SCT conda environment:
+#       source ${SCT_DIR}/python/etc/profile.d/conda.sh
+#       conda activate venv_sct
+#
+#   2. Example usage:
+#       bash process_data.sh \
+#        -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
+#        -b ~/data/experiments/balgrist-sci/bids \
+#        -r ~/data/experiments/balgrist-sci/data_processed \
+#        -p sub-001 \
+#        -s ses-01 \
+#        -c acq-ax_T2w acq-sag_T2w \
+#        -a 30 \
+#        -x M
 #
 # Authors: Jan Valosek, Sandrine Bedard
 # AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
