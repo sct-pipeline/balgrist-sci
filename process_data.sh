@@ -198,6 +198,44 @@ segment_if_does_not_exist() {
   fi
 }
 
+# Perform disc labeling using the TotalSpineSeg model
+label_if_does_not_exist(){
+  ###
+  #  This function checks if a manual disc label file already exists, then:
+  #     - If it does, copy it locally.
+  #     - If it doesn't, perform automatic labeling.
+  #   This allows you to add manual labels on a subject-by-subject basis without disrupting the pipeline.
+  ###
+  local file="$1"
+  local file_seg="$2"
+  local contrast="$3"   # used for sct_label_vertebrae to create labeled segmentation from disc labels created by TotalSpineSeg
+  # Copy manual disc labels from derivatives/labels if they exist
+  FILELABEL="${file}_label-disc"
+  FILELABELMANUAL="${bids_folder}/derivatives/labels/${SUBJECT}/anat/${FILELABEL}"
+  echo "Looking for manual disc labels: $FILELABELMANUAL"
+  if [[ -e $FILELABELMANUAL ]]; then
+    echo "Found! Using manual disc labels."
+    cp $FILELABELMANUAL.nii.gz ${FILELABEL}.nii.gz
+    cp "${FILELABELMANUAL}".json "${FILELABEL}".json
+  else
+    echo "Manual disc labels not found. Proceeding with automatic labeling."
+    sct_deepseg -i ${file}.nii.gz -task totalspineseg
+    # Keep only discs (`_step1_levels.nii.gz) and remove the files
+    rm -f ${file}_step1_canal.nii.gz ${file}_step1_cord.nii.gz ${file}_step1_output.nii.gz ${file}_step2_output.nii.gz
+    mv ${file}_step1_levels.nii.gz ${FILELABEL}.nii.gz
+    mv ${file}_step2_output.json ${FILELABEL}.json
+  fi
+
+  # Generate labeled segmentation using init disc labels
+  sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -discfile ${FILELABEL}.nii.gz -c ${contrast} -qc ${PATH_QC} -qc-subject ${file}
+  # Output is `${file_seg}_labeled.nii.gz`
+
+  # Create disc labels QC
+  sct_qc -i ${file}.nii.gz -s ${FILELABEL}.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject "${SUBJECT}"
+#  # Create labels in the cord at C3 and C5 mid-vertebral levels (needed for template registration)
+#  sct_label_utils -i ${file_seg}_labeled.nii.gz -vert-body 3,5 -o ${file}_label-vert_c3c5.nii.gz
+}
+
 process_t2w_ax()
 {
     local suffix=$1
@@ -229,6 +267,7 @@ process_t2w_sag()
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
     segment_if_does_not_exist "$file_t2" t2
     file_t2_seg="${FILESEG}"
+    label_if_does_not_exist "$file_t2" "$file_t2_seg" t2
 
     # Go back to the subject root folder
     cd ..
