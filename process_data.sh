@@ -286,6 +286,7 @@ main_analysis()
     # Define path to the folder where QC will be stored
     PATH_QC="${results_folder}"/qc
     SUBJECT="${participant_id}/${session_id}"
+    # TODO: add a path for log files
 
     # Go to subject folder in the results folder
     cd "${SUBJECT}"
