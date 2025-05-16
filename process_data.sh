@@ -266,6 +266,40 @@ label_if_does_not_exist(){
 
 }
 
+bring_sag_disc_lables_to_ax()
+{
+  ###
+  # This function brings the T2w sagittal disc labels to the T2w axial space:
+  #     - Bring T2w sagittal image to T2w axial image to obtain warping field.
+  #     - This warping field will be used to bring the T2w sagittal disc labels to the T2w axial space.
+  #     - Generate QC report to assess warped disc labels.
+  #     - Label T2w axial spinal cord segmentation using the disc labels.
+  # Context: https://github.com/sct-pipeline/dcm-metric-normalization/issues/9
+  # Inspired by: https://github.com/sct-pipeline/dcm-metric-normalization/blob/r20250320/scripts/process_data_dcm-zurich.sh#L155-L176
+  local file_t2_ax="$1"
+  local file_t2_ax_seg="$2"
+  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way to
+  local file_t2_sag_seg="${file_t2_ax_seg/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way to
+
+  # Note: the '-dseg' is used only for the QC report
+  sct_register_multimodal -i ${file_t2_sag}.nii.gz -d ${file_t2_ax}.nii.gz -identity 1 -x nn -qc ${PATH_QC} -qc-subject ${SUBJECT} -dseg ${file_t2_ax_seg}.nii.gz
+  # Bring T2w sagittal disc labels (located in the middle of the spinal cord) to T2w axial space
+  # Context: https://github.com/sct-pipeline/dcm-metric-normalization/issues/10
+  sct_apply_transfo -i ${file_t2_sag_seg}_labeled_discs.nii.gz -d ${file_t2_ax}.nii.gz -w warp_${file_t2_sag}2${file_t2_ax}.nii.gz -x label
+  # Generate QC report to assess warped disc labels
+  sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_sag_seg}_labeled_discs_reg.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject ${SUBJECT}
+
+  file_t2_ax_labels=${file_t2_sag_seg}_labeled_discs_reg
+
+  # Label T2w axial spinal cord segmentation. Either using manual disc labels or using disc labels from sagittal image.
+  # Note: here we use sct_label_utils instead of sct_label_vertebrae to avoid SC straightening
+  # Context: https://github.com/spinalcordtoolbox/spinalcordtoolbox/pull/4072
+  sct_label_utils -i ${file_t2_ax_seg}.nii.gz -disc ${file_t2_ax_labels}.nii.gz -o ${file_t2_ax_seg}_labeled.nii.gz
+  # Generate QC report to assess labeled segmentation
+  sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_ax_seg}_labeled.nii.gz -p sct_label_vertebrae -qc ${PATH_QC} -qc-subject ${SUBJECT}
+
+}
+
 process_t2w_ax()
 {
     local suffix=$1
@@ -279,6 +313,8 @@ process_t2w_ax()
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
     segment_if_does_not_exist "$file_t2" t2
     file_t2_seg="${FILESEG}"
+
+    bring_sag_disc_lables_to_ax "${file_t2}" "${file_t2_seg}"
 
     # Go back to the subject root folder
     cd ..
