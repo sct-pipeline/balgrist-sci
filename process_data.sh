@@ -333,7 +333,7 @@ process_t2w_sag()
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
     segment_if_does_not_exist "$file_t2" t2
     file_t2_seg="${FILESEG}"
-    label_if_does_not_exist "$file_t2" "$file_t2_seg" t2
+    label_if_does_not_exist "$file_t2" "$file_t2_seg" acq-sag
 
     # Go back to the subject root folder
     cd ..
