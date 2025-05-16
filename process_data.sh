@@ -306,13 +306,13 @@ process_t2w_sag()
     cd anat
 
     # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-sag_T2w
-    file_t2="${participant_id}_${session_id}_${contrast}"
+    file_t2_sag="${participant_id}_${session_id}_${contrast}"
 
     # Segment spinal cord (only if it does not exist)
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
-    segment_if_does_not_exist "$file_t2" t2
-    file_t2_seg="${FILESEG}"
-    label_discs_if_does_not_exist "$file_t2" "$file_t2_seg" acq-sag
+    segment_if_does_not_exist "$file_t2_sag" t2
+    file_t2_sag_seg="${FILESEG}"
+    label_discs_if_does_not_exist "$file_t2_sag" "$file_t2_sag_seg" acq-sag
 
     # Go back to the subject root folder
     cd ..
@@ -325,14 +325,14 @@ process_t2w_ax()
     cd anat
 
     # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-ax_T2w
-    file_t2="${participant_id}_${session_id}_${contrast}"
+    file_t2_ax="${participant_id}_${session_id}_${contrast}"
 
     # Segment spinal cord (only if it does not exist)
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
-    segment_if_does_not_exist "$file_t2" t2
-    file_t2_seg="${FILESEG}"
+    segment_if_does_not_exist "$file_t2_ax" t2
+    file_t2_ax_seg="${FILESEG}"
 
-    bring_sag_disc_lables_to_ax "${file_t2}" "${file_t2_seg}"
+    bring_sag_disc_lables_to_ax "${file_t2_ax}" "${file_t2_ax_seg}"
 
     # Go back to the subject root folder
     cd ..
