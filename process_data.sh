@@ -278,8 +278,8 @@ bring_sag_disc_lables_to_ax()
   # Inspired by: https://github.com/sct-pipeline/dcm-metric-normalization/blob/r20250320/scripts/process_data_dcm-zurich.sh#L155-L176
   local file_t2_ax="$1"
   local file_t2_ax_seg="$2"
-  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way to
-  local file_t2_sag_seg="${file_t2_ax_seg/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way to
+  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
+  local file_t2_sag_seg="${file_t2_ax_seg/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
 
   # Note: the '-dseg' is used only for the QC report
   sct_register_multimodal -i ${file_t2_sag}.nii.gz -d ${file_t2_ax}.nii.gz -identity 1 -x nn -qc ${PATH_QC} -qc-subject ${SUBJECT} -dseg ${file_t2_ax_seg}.nii.gz
