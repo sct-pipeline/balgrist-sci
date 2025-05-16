@@ -292,6 +292,7 @@ bring_sag_disc_lables_to_ax()
   #     - Label T2w axial spinal cord segmentation using the disc labels.
   # Context: https://github.com/sct-pipeline/dcm-metric-normalization/issues/9
   # Inspired by: https://github.com/sct-pipeline/dcm-metric-normalization/blob/r20250320/scripts/process_data_dcm-zurich.sh#L155-L176
+  ###
   local file_t2_ax="$1"
   local file_t2_ax_seg="$2"
   local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
