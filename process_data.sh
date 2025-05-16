@@ -384,6 +384,17 @@ process_t2w_ax()
 
     bring_sag_disc_lables_to_ax "${file_t2_ax}" "${file_t2_ax_seg}"
 
+    label_compression_if_does_not_exist "${file_t2_ax}"
+    file_t2_ax_compression="${FILECOMPRESSION}"
+
+    metrics="diameter_AP area diameter_RL eccentricity solidity"
+    for metric in ${metrics}; do
+        sct_compute_compression -i ${file_t2_ax_seg}.nii.gz -l ${file_t2_ax_compression}.nii.gz -vertfile ${file_t2_ax_seg}_labeled.nii.gz -mode compression -metric ${metric} -o ${PATH_RESULTS}/mscc.csv
+        # TODO: use also '-sex' and '-age' args when they are provided
+    done
+
+    echo_with_linebreaks "Compression metrics saved as:\n\t"${PATH_RESULTS}"/mscc.csv"
+
     # Go back to the subject root folder
     cd ..
 }
@@ -395,6 +406,11 @@ main_analysis()
 
     # Define path to the folder where QC will be stored
     PATH_QC="${results_folder}"/qc
+    PATH_RESULTS="${results_folder}"/results
+    # Create PATH_RESULTS if it does not exist
+    if [ ! -d "${PATH_RESULTS}" ]; then
+        mkdir -p "${PATH_RESULTS}"
+    fi
     SUBJECT="${participant_id}/${session_id}"
     # TODO: add a path for log files
 
