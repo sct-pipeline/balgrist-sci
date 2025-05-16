@@ -204,7 +204,6 @@ segment_if_does_not_exist() {
   fi
 }
 
-# Perform disc labeling using the TotalSpineSeg model
 label_if_does_not_exist(){
   ###
   #  This function checks if a manual disc label file already exists, then:
@@ -219,28 +218,52 @@ label_if_does_not_exist(){
   # Copy manual disc labels from derivatives/labels if they exist
   FILELABEL="${file}_label-disc"
   FILELABELMANUAL="${bids_folder}/derivatives/labels/${SUBJECT}/anat/${FILELABEL}"
-  echo "Looking for manual disc labels: $FILELABELMANUAL"
-  if [[ -e $FILELABELMANUAL ]]; then
+  echo "Looking for manual disc labels: ${FILELABELMANUAL}.nii.gz"
+  if [[ -e ${FILELABELMANUAL}.nii.gz ]]; then
     echo "Found! Using manual disc labels."
     cp $FILELABELMANUAL.nii.gz ${FILELABEL}.nii.gz
-    cp "${FILELABELMANUAL}".json "${FILELABEL}".json
+    # cp "${FILELABELMANUAL}".json "${FILELABEL}".json  # TODO: uncomment once we have a JSON sidecar for disc labels
+    # Generate labeled segmentation from manual disc labels
+    sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -discfile ${FILELABEL}.nii.gz -c t2 -qc ${PATH_QC} -qc-subject ${SUBJECT}
   else
-    echo "Manual disc labels not found. Proceeding with automatic labeling."
-    sct_deepseg -i ${file}.nii.gz -task totalspineseg
-    # Keep only discs (`_step1_levels.nii.gz) and remove the files
-    rm -f ${file}_step1_canal.nii.gz ${file}_step1_cord.nii.gz ${file}_step1_output.nii.gz ${file}_step2_output.nii.gz
-    mv ${file}_step1_levels.nii.gz ${FILELABEL}.nii.gz
-    mv ${file}_step2_output.json ${FILELABEL}.json
+    echo "Not found. Proceeding with automatic labeling."
+    # Automatically label discs and generate labeled segmentation
+    sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -c t2 -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    mv ${file_seg}_labeled_discs.nii.gz ${FILELABEL}.nii.gz
+    # Create disc labels QC
+    sct_qc -i ${file}.nii.gz -s ${FILELABEL}.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject "${SUBJECT}"
+
+    # Open QC
+    echo_with_linebreaks "Opening quality control report for disc labels in in your browser.\nIn the report, navigate to the disc labels ('sct_label_utils' in the 'Function' column) and assess the quality of the labels.\nAre the disc labels correct? (y/n)"
+    open ${PATH_QC}/index.html
+    # Read user input
+    read -r answer
+    while true; do
+      if [[ $answer == "y" ]]; then
+        echo "Copying disc labels to the derivatives folder..."
+        cp ${FILELABEL}.nii.gz ${FILELABELMANUAL}.nii.gz
+        # TODO: add an entry who QCed (and corrected) the disc labels to the JSON sidecar
+        cp ${FILELABEL}.json ${FILELABELMANUAL}.json
+        break
+      elif [[ $answer == "n" ]]; then
+        echo "Please manually label the discs."
+        message="Click at the posterior tip of the discs. Then click 'Save and Quit'."
+        # TODO: do we want to use '-ilabel' to open automatic labels (which might be wrong) in the viewer? Or is it better
+        #  to label from scratch?
+        sct_label_utils -i ${file}.nii.gz -create-viewer 1:12 -o ${FILELABEL}.nii.gz -msg message
+        cp ${FILELABEL}.nii.gz ${FILELABELMANUAL}.nii.gz
+        # TODO: create a JSON sidecar with the information about the user who created the labels
+        # TODO: manual disc labels are located at the posterior tip of the discs. Do we want to bring them to the spinal
+        #  cord centerline to be consistent with the automatic labels (`${file_seg}_labeled_discs.nii.gz`)?
+        break
+      else
+        echo "Invalid input. Please enter 'y' (yes) or 'n' (no):"
+        read -r answer
+      fi
+    done
+    echo_with_linebreaks "Disc labels saved as:\n\t"${FILELABELMANUAL}".nii.gz"
   fi
 
-  # Generate labeled segmentation using init disc labels
-  sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -discfile ${FILELABEL}.nii.gz -c ${contrast} -qc ${PATH_QC} -qc-subject ${file}
-  # Output is `${file_seg}_labeled.nii.gz`
-
-  # Create disc labels QC
-  sct_qc -i ${file}.nii.gz -s ${FILELABEL}.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject "${SUBJECT}"
-#  # Create labels in the cord at C3 and C5 mid-vertebral levels (needed for template registration)
-#  sct_label_utils -i ${file_seg}_labeled.nii.gz -vert-body 3,5 -o ${file}_label-vert_c3c5.nii.gz
 }
 
 process_t2w_ax()
