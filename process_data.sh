@@ -130,7 +130,12 @@ echo_with_linebreaks()
 
 echo_fsleyes_instructions_seg()
 {
-    echo_with_linebreaks "Opening FSLeyes, it might take a few seconds...\nCheck the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),\nand save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').\nThen close FSLeyes to continue."
+    echo_with_linebreaks "
+    Opening FSLeyes, it might take a few seconds...
+    Check the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),
+    and save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').
+    Then close FSLeyes to continue.
+    "
 }
 
 echo_fsleyes_instructions_compression()
