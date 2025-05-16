@@ -194,6 +194,7 @@ segment_if_does_not_exist() {
     echo_fsleyes_instructions
     fsleyes "$file_t2".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
+    # (to be reused in the future analysis)
     cp "${FILESEG}".nii.gz "${FILESEGMANUAL}".nii.gz
     # TODO: add an entry who QCed and corrected the segmentation to the JSON sidecar
     cp "${FILESEG}".json "${FILESEGMANUAL}".json
@@ -209,11 +210,12 @@ label_if_does_not_exist(){
   #  This function checks if a manual disc label file already exists, then:
   #     - If it does, copy it locally.
   #     - If it doesn't, perform automatic labeling.
+  #   Then, the function generates a labeled segmentation using the disc labels.
   #   This allows you to add manual labels on a subject-by-subject basis without disrupting the pipeline.
   ###
   local file="$1"
   local file_seg="$2"
-  local contrast="$3"   # used for sct_label_vertebrae to create labeled segmentation from disc labels created by TotalSpineSeg
+  local contrast="$3"    # acq-sag_T2w or acq-ax_T2w
   # Copy manual disc labels from derivatives/labels if they exist
   FILELABEL="${file}_label-disc"
   FILELABELMANUAL="${bids_folder}/derivatives/labels/${SUBJECT}/anat/${FILELABEL}"
