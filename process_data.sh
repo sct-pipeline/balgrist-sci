@@ -133,6 +133,17 @@ echo_fsleyes_instructions_seg()
     echo_with_linebreaks "Opening FSLeyes, it might take a few seconds...\nCheck the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),\nand save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').\nThen close FSLeyes to continue."
 }
 
+echo_fsleyes_instructions_compression()
+{
+  echo_with_linebreaks "
+  Opening FSLeyes, it might take a few seconds...
+  Select the axial slice at the maximum compression level.
+  Then, use the 'Pencil' tool ('Tools' --> 'Edit mode' --> 'Pencil') to place the compression label at the center of the spinal cord of such axial slice.
+  Finally, save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite') and close FSLeyes to continue.
+  For details, see: https://spinalcordtoolbox.com/stable/user_section/tutorials/shape-analysis/normalizing-morphometrics-compressions/generate-necessary-inputs.html
+  "
+}
+
 # Convert DICOM files to NIfTI format using the file_loader.py script, which calls the dcm2niix function
 convert_dcm2nii()
 {
@@ -297,6 +308,39 @@ bring_sag_disc_lables_to_ax()
   sct_label_utils -i ${file_t2_ax_seg}.nii.gz -disc ${file_t2_ax_labels}.nii.gz -o ${file_t2_ax_seg}_labeled.nii.gz
   # Generate QC report to assess labeled segmentation
   sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_ax_seg}_labeled.nii.gz -p sct_label_vertebrae -qc ${PATH_QC} -qc-subject ${SUBJECT}
+}
+
+label_compression_if_does_not_exist()
+{
+  ###
+  # This function checks if a manual compression label file already exists, then:
+  #     - If it does, copy it locally.
+  #     - If it doesn't, perform manual compression labeling.
+  # For details, see: https://spinalcordtoolbox.com/stable/user_section/tutorials/shape-analysis/normalizing-morphometrics-compressions/generate-necessary-inputs.html
+  ###
+  local file_t2_ax="$1"
+  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
+
+  # Copy manual compression labels from derivatives/labels if they exist
+  FILECOMPRESSION="${file_t2_ax}_label-compression"
+  FILECOMPRESSIONMANUAL="${bids_folder}/derivatives/labels/${SUBJECT}/anat/${FILECOMPRESSION}"
+  echo "Looking for manual compression labels: ${FILECOMPRESSIONMANUAL}.nii.gz"
+  if [[ -e ${FILECOMPRESSIONMANUAL}.nii.gz ]]; then
+    echo "Found! Using manual compression labels."
+    cp ${FILECOMPRESSIONMANUAL}.nii.gz ${FILECOMPRESSION}.nii.gz
+    # cp "${FILECOMPRESSIONMANUAL}".json "${FILECOMPRESSION}".json  # TODO: uncomment once we have a JSON sidecar for disc labels
+  else
+    echo "Not found. Proceeding with manual compression labeling."
+    # Create an empty compression label file from the T2w axial image (as the compression label file should be in the same space as the T2w axial image)
+    sct_maths -i ${file_t2_ax}.nii.gz -mul 0 -type uint8 -o ${FILECOMPRESSION}.nii.gz
+
+    echo_fsleyes_instructions_compression
+    #fsleyes ${file_t2_sag}.nii.gz ${file_t2_ax}.nii.gz -a 80.0 ${FILECOMPRESSION}.nii.gz   # Do we want to show also sag image in the viewer?
+    fsleyes ${file_t2_ax}.nii.gz ${FILECOMPRESSION}.nii.gz
+    cp ${FILECOMPRESSION}.nii.gz ${FILECOMPRESSIONMANUAL}.nii.gz
+    # TODO: create a JSON sidecar with the information about the user who created the compression labels files
+    echo_with_linebreaks "Compression label file saved as:\n\t"${FILECOMPRESSIONMANUAL}".nii.gz"
+  fi
 }
 
 process_t2w_sag()
