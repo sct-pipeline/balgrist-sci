@@ -204,7 +204,7 @@ segment_if_does_not_exist() {
   fi
 }
 
-label_if_does_not_exist(){
+label_discs_if_does_not_exist(){
   ###
   #  This function checks if a manual disc label file already exists, then:
   #     - If it does, copy it locally.
@@ -313,7 +313,7 @@ process_t2w_sag()
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
     segment_if_does_not_exist "$file_t2" t2
     file_t2_seg="${FILESEG}"
-    label_if_does_not_exist "$file_t2" "$file_t2_seg" acq-sag
+    label_discs_if_does_not_exist "$file_t2" "$file_t2_seg" acq-sag
 
     # Go back to the subject root folder
     cd ..
