@@ -24,7 +24,7 @@ Steps:
 
 ### 1.1 Dependencies
 
-* [Spinal Cord Toolbox v6.5](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.5): toolbox for processing spinal cord MRI data
+* [Spinal Cord Toolbox v7.0](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/7.0): toolbox for processing spinal cord MRI data
 * [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install): tool for converting DICOM images into the NIfTI format
 * [FSLeyes](https://owncloud.cesnet.cz/index.php/s/z5h02r0cq0B7ESf): tool for visualizing NIfTI images
 
@@ -48,14 +48,14 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 ```bash
 # Go to your home directory
 cd ~
-# Download SCT v6.5
-curl -L -o 6.5.zip https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/6.5.zip
-# Unzip the downloaded file --> the unzipped directory will be named spinalcordtoolbox-6.5
-unzip 6.5.zip
-rm 6.5.zip
+# Download SCT v7.0
+curl -L -o 7.0.zip https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/7.0.zip
+# Unzip the downloaded file --> the unzipped directory will be named spinalcordtoolbox-7.0
+unzip 7.0.zip
+rm 7.0.zip
 # Go to the SCT directory
-cd spinalcordtoolbox-6.5
-# Install SCT v6.5
+cd spinalcordtoolbox-7.0
+# Install SCT v7.0
 ./install_sct -iyc
 #  '-i'   Install in-place (i.e., in the current directory)
 #  '-y'   Install without interruption with 'yes' as default answer
