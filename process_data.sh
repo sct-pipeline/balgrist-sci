@@ -221,7 +221,7 @@ label_discs_if_does_not_exist(){
   echo "Looking for manual disc labels: ${FILELABELMANUAL}.nii.gz"
   if [[ -e ${FILELABELMANUAL}.nii.gz ]]; then
     echo "Found! Using manual disc labels."
-    cp $FILELABELMANUAL.nii.gz ${FILELABEL}.nii.gz
+    cp ${FILELABELMANUAL}.nii.gz ${FILELABEL}.nii.gz
     # cp "${FILELABELMANUAL}".json "${FILELABEL}".json  # TODO: uncomment once we have a JSON sidecar for disc labels
     # Generate labeled segmentation from manual disc labels
     sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -discfile ${FILELABEL}.nii.gz -c t2 -qc ${PATH_QC} -qc-subject ${SUBJECT}
