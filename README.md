@@ -24,7 +24,7 @@ Steps:
 
 ### 1.1 Dependencies
 
-* [Spinal Cord Toolbox v6.5](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/6.5): toolbox for processing spinal cord MRI data
+* [Spinal Cord Toolbox v7.0](https://github.com/spinalcordtoolbox/spinalcordtoolbox/releases/tag/7.0): toolbox for processing spinal cord MRI data
 * [dcm2niix >= v1.0.20220505](https://github.com/rordenlab/dcm2niix?tab=readme-ov-file#install): tool for converting DICOM images into the NIfTI format
 * [FSLeyes](https://owncloud.cesnet.cz/index.php/s/z5h02r0cq0B7ESf): tool for visualizing NIfTI images
 
@@ -48,14 +48,14 @@ Press <kbd>command</kbd> + <kbd>space</kbd> and type `Terminal` and press <kbd>r
 ```bash
 # Go to your home directory
 cd ~
-# Download SCT v6.5
-curl -L -o 6.5.zip https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/6.5.zip
-# Unzip the downloaded file --> the unzipped directory will be named spinalcordtoolbox-6.5
-unzip 6.5.zip
-rm 6.5.zip
+# Download SCT v7.0
+curl -L -o 7.0.zip https://github.com/spinalcordtoolbox/spinalcordtoolbox/archive/refs/tags/7.0.zip
+# Unzip the downloaded file --> the unzipped directory will be named spinalcordtoolbox-7.0
+unzip 7.0.zip
+rm 7.0.zip
 # Go to the SCT directory
-cd spinalcordtoolbox-6.5
-# Install SCT v6.5
+cd spinalcordtoolbox-7.0
+# Install SCT v7.0
 ./install_sct -iyc
 #  '-i'   Install in-place (i.e., in the current directory)
 #  '-y'   Install without interruption with 'yes' as default answer
@@ -208,14 +208,10 @@ The rest of the directories and files will be created during the processing; see
 ├── bids                    --> folder with BIDS-compliant data
 │    ├── sub-001            --> folder containing NIfTI files for first subject
 │    │   ├── ses-01         --> first session
-│    │   │  ├── anat        --> folder with anatomical data
-│    │   │  │  ├── sub-001_ses-01_T1w.nii.gz
-│    │   │  │  ├── sub-001_ses-01_T2w.nii.gz
-│    │   │  │  ├── ...
-│    │   │  └── dwi         --> folder with diffusion data
-│    │   │     ├── sub-001_ses-01_dwi.nii.gz
-│    │   │     ├── sub-001_ses-01_dwi.bval
-│    │   │     ├── sub-001_ses-01_dwi.bvec
+│    │   │  └── anat        --> folder with anatomical data
+│    │   │     ├── sub-001_ses-01_acq-sag_T2w.nii.gz
+│    │   │     ├── sub-001_ses-01_acq-ax_T2w.nii.gz
+│    │   │     ├── ...
 │    │   └── ses-02         --> second session
 │    │      ├── ...
 │    ├── sub-002            --> folder containing NIfTI files for second subject
@@ -225,12 +221,9 @@ The rest of the directories and files will be created during the processing; see
 │        └── labels
 │            ├── sub-001    --> first subject
 │            │   ├── ses-01 --> first session
-│            │   │  ├── anat
-│            │   │  │  ├── sub-001_ses-01_T2w_label-SC_seg.nii.gz              --> spinal cord (SC) binary segmentation
-│            │   │  │  ├── sub-001_ses-01_T2w_label-compression_label.nii.gz   --> binary compression labeling
-│            │   │  │  ├── ...
-│            │   │  └── dwi
-│            │   │     ├── sub-001_ses-01_dwi_label-SC_seg.nii.gz
+│            │   │  └── anat
+│            │   │     ├── sub-001_ses-01_acq-sag_T2w_label-SC_seg.nii.gz      --> spinal cord (SC) binary segmentation
+│            │   │     ├── sub-001_ses-01_acq-sag_T2w_label-disc.nii.gz        --> discrete discs labeling
 │            │   │     ├── ...
 │            │   └── ses-02 --> second session
 │            │      ├── ...
@@ -277,7 +270,7 @@ MANDATORY ARGUMENTS
   -r <results folder>         Path to the folder where the results will be stored. Example: ~/sci-balgrist-study/data_processed
   -p <participant id>         Participant ID. Example: sub-001
   -s <session id>             Session ID. Example: ses-01
-  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'T2w' or 'T2w dwi'
+  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'acq-sag_T2w' and/or 'acq-ax_T2w'
 
 OPTIONAL ARGUMENTS
   -a <age>                  Age of the subject at the time of the MRI scan. The provided value will be stored to participants.tsv file. Example: 25. Default: n/a
@@ -293,7 +286,7 @@ bash process_data.sh \
   -r ~/data/experiments/balgrist-sci/data_processed \
   -p sub-001 \
   -s ses-01 \
-  -c T2w dwi \
+  -c acq-sag_T2w acq-ax_T2w \
   -a 30 \
   -x M
 ```

@@ -11,16 +11,21 @@
 #   - dcm2niix
 #   - FSLeyes
 #
-# Example usage:
-#     bash process_data.sh \
-#       -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
-#       -b ~/data/experiments/balgrist-sci/bids \
-#       -r ~/data/experiments/balgrist-sci/data_processed \
-#       -p sub-001 \
-#       -s ses-01 \
-#       -c T2w dwi \
-#       -a 30 \
-#       -x M
+# Usage:
+#   1. Activate the SCT conda environment:
+#       source ${SCT_DIR}/python/etc/profile.d/conda.sh
+#       conda activate venv_sct
+#
+#   2. Example usage:
+#       bash process_data.sh \
+#        -d ~/data/experiments/balgrist-sci/source_data/dir_20231010 \
+#        -b ~/data/experiments/balgrist-sci/bids \
+#        -r ~/data/experiments/balgrist-sci/data_processed \
+#        -p sub-001 \
+#        -s ses-01 \
+#        -c acq-ax_T2w acq-sag_T2w \
+#        -a 30 \
+#        -x M
 #
 # Authors: Jan Valosek, Sandrine Bedard
 # AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
@@ -51,7 +56,7 @@ MANDATORY ARGUMENTS
   -r <results folder>         Path to the folder where the results will be stored. Example: ~/sci-balgrist-study/data_processed
   -p <participant id>         Participant ID. Example: sub-001
   -s <session id>             Session ID. Example: ses-01
-  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'T2w' or 'T2w dwi'
+  -c <contrasts>              MRI contrasts to use (space-separated if multiple). Examples: 'acq-sag_T2w' and/or 'acq-ax_T2w'
 
 OPTIONAL ARGUMENTS
   -a <age>                  Age of the subject at the time of the MRI scan. The provided value will be stored to participants.tsv file. Example: 25. Default: n/a
@@ -123,9 +128,25 @@ echo_with_linebreaks()
     echo "${line}"
 }
 
-echo_fsleyes_instructions()
+echo_fsleyes_instructions_seg()
 {
-    echo_with_linebreaks "Opening FSLeyes (close FSLeyes to continue)...\nCheck the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),\nand save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').\nThen close FSLeyes to continue."
+    echo_with_linebreaks "
+    Opening FSLeyes, it might take a few seconds...
+    Check the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),
+    and save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').
+    Then close FSLeyes to continue.
+    "
+}
+
+echo_fsleyes_instructions_compression()
+{
+  echo_with_linebreaks "
+  Opening FSLeyes, it might take a few seconds...
+  Select the axial slice at the maximum compression level.
+  Then, use the 'Pencil' tool ('Tools' --> 'Edit mode' --> 'Pencil') to place the compression label at the center of the spinal cord of such axial slice.
+  Finally, save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite') and close FSLeyes to continue.
+  For details, see: https://spinalcordtoolbox.com/stable/user_section/tutorials/shape-analysis/normalizing-morphometrics-compressions/generate-necessary-inputs.html
+  "
 }
 
 # Convert DICOM files to NIfTI format using the file_loader.py script, which calls the dcm2niix function
@@ -172,41 +193,210 @@ segment_if_does_not_exist() {
   local contrast="${2}"
   # Update global variable with segmentation file name
   FILESEG="${file}"_label-SC_seg
-  FILESEGMANUAL="${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/"${FILESEG}".nii.gz
+  FILESEGMANUAL="${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/"${FILESEG}"
   echo
-  echo "Looking for manual segmentation: ${FILESEGMANUAL}"
-  if [[ -e "${FILESEGMANUAL}" ]]; then
+  echo "Looking for manual segmentation: ${FILESEGMANUAL}.nii.gz"
+  if [[ -e "${FILESEGMANUAL}".nii.gz ]]; then
     echo "Found! Using manual segmentation."
-    cp "${FILESEGMANUAL}" "${FILESEG}".nii.gz
+    cp "${FILESEGMANUAL}".nii.gz "${FILESEG}".nii.gz
+    cp "${FILESEGMANUAL}".json "${FILESEG}".json
     sct_qc -i "${file}".nii.gz -s "${FILESEG}".nii.gz -p sct_deepseg_sc -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
   else
     echo "Not found. Proceeding with automatic segmentation."
     # Segment spinal cord
-    sct_deepseg -i "${file}".nii.gz -task seg_sc_contrast_agnostic -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
+    sct_deepseg spinalcord -i "${file}".nii.gz -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
+
+    # Open FSLeyes to visualize the segmentation
+    echo_fsleyes_instructions_seg
+    fsleyes "$file_t2".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
+    # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
+    # (to be reused in the future analysis)
+    cp "${FILESEG}".nii.gz "${FILESEGMANUAL}".nii.gz
+    # TODO: add an entry who QCed and corrected the segmentation to the JSON sidecar
+    cp "${FILESEG}".json "${FILESEGMANUAL}".json
+
+    echo_with_linebreaks "Spinal cord segmentation saved as:\n\t"${FILESEGMANUAL}".nii.gz\n"
+
   fi
 }
 
-process_t2w()
+label_discs_if_does_not_exist(){
+  ###
+  #  This function checks if a manual disc label file already exists, then:
+  #     - If it does, copy it locally.
+  #     - If it doesn't, perform automatic labeling.
+  #   Then, the function generates a labeled segmentation using the disc labels.
+  #   This allows you to add manual labels on a subject-by-subject basis without disrupting the pipeline.
+  ###
+  local file="$1"
+  local file_seg="$2"
+  local contrast="$3"    # acq-sag_T2w or acq-ax_T2w
+  # Copy manual disc labels from derivatives/labels if they exist
+  FILELABEL="${file}_label-disc"
+  FILELABELMANUAL="${bids_folder}/derivatives/labels/${SUBJECT}/anat/${FILELABEL}"
+  echo "Looking for manual disc labels: ${FILELABELMANUAL}.nii.gz"
+  if [[ -e ${FILELABELMANUAL}.nii.gz ]]; then
+    echo "Found! Using manual disc labels."
+    cp ${FILELABELMANUAL}.nii.gz ${FILELABEL}.nii.gz
+    # cp "${FILELABELMANUAL}".json "${FILELABEL}".json  # TODO: uncomment once we have a JSON sidecar for disc labels
+    # Generate labeled segmentation from manual disc labels
+    sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -discfile ${FILELABEL}.nii.gz -c t2 -qc ${PATH_QC} -qc-subject ${SUBJECT}
+  else
+    echo "Not found. Proceeding with automatic labeling."
+    # Automatically label discs and generate labeled segmentation
+    sct_label_vertebrae -i ${file}.nii.gz -s ${file_seg}.nii.gz -c t2 -qc ${PATH_QC} -qc-subject ${SUBJECT}
+    mv ${file_seg}_labeled_discs.nii.gz ${FILELABEL}.nii.gz
+    # Create disc labels QC
+    sct_qc -i ${file}.nii.gz -s ${FILELABEL}.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject "${SUBJECT}"
+
+    # Open QC
+    echo_with_linebreaks "Opening quality control report for disc labels in in your browser.\nIn the report, navigate to the disc labels ('sct_label_utils' in the 'Function' column) and assess the quality of the labels.\nAre the disc labels correct? (y/n)"
+    open ${PATH_QC}/index.html
+    # Read user input
+    read -r answer
+    while true; do
+      if [[ $answer == "y" ]]; then
+        echo "Copying disc labels to the derivatives folder..."
+        cp ${FILELABEL}.nii.gz ${FILELABELMANUAL}.nii.gz
+        # TODO: add an entry who QCed (and corrected) the disc labels to the JSON sidecar
+        cp ${FILELABEL}.json ${FILELABELMANUAL}.json
+        break
+      elif [[ $answer == "n" ]]; then
+        echo "Please manually label the discs."
+        message="Click at the posterior tip of the discs. Then click 'Save and Quit'."
+        # TODO: do we want to use '-ilabel' to open automatic labels (which might be wrong) in the viewer? Or is it better
+        #  to label from scratch?
+        sct_label_utils -i ${file}.nii.gz -create-viewer 1:12 -o ${FILELABEL}.nii.gz -msg message
+        cp ${FILELABEL}.nii.gz ${FILELABELMANUAL}.nii.gz
+        # TODO: create a JSON sidecar with the information about the user who created the labels
+        # TODO: manual disc labels are located at the posterior tip of the discs. Do we want to bring them to the spinal
+        #  cord centerline to be consistent with the automatic labels (`${file_seg}_labeled_discs.nii.gz`)?
+        break
+      else
+        echo "Invalid input. Please enter 'y' (yes) or 'n' (no):"
+        read -r answer
+      fi
+    done
+    echo_with_linebreaks "Disc labels saved as:\n\t"${FILELABELMANUAL}".nii.gz"
+  fi
+
+}
+
+bring_sag_disc_lables_to_ax()
 {
-    local suffix=$1
+  ###
+  # This function brings the T2w sagittal disc labels to the T2w axial space:
+  #     - Bring T2w sagittal image to T2w axial image to obtain warping field.
+  #     - This warping field will be used to bring the T2w sagittal disc labels to the T2w axial space.
+  #     - Generate QC report to assess warped disc labels.
+  #     - Label T2w axial spinal cord segmentation using the disc labels.
+  # Context: https://github.com/sct-pipeline/dcm-metric-normalization/issues/9
+  # Inspired by: https://github.com/sct-pipeline/dcm-metric-normalization/blob/r20250320/scripts/process_data_dcm-zurich.sh#L155-L176
+  ###
+  local file_t2_ax="$1"
+  local file_t2_ax_seg="$2"
+  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
+  local file_t2_sag_seg="${file_t2_ax_seg/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
+
+  # Note: the '-dseg' is used only for the QC report
+  sct_register_multimodal -i ${file_t2_sag}.nii.gz -d ${file_t2_ax}.nii.gz -identity 1 -x nn -qc ${PATH_QC} -qc-subject ${SUBJECT} -dseg ${file_t2_ax_seg}.nii.gz
+  # Bring T2w sagittal disc labels (located in the middle of the spinal cord) to T2w axial space
+  # Context: https://github.com/sct-pipeline/dcm-metric-normalization/issues/10
+  sct_apply_transfo -i ${file_t2_sag_seg}_labeled_discs.nii.gz -d ${file_t2_ax}.nii.gz -w warp_${file_t2_sag}2${file_t2_ax}.nii.gz -x label
+  # Generate QC report to assess warped disc labels
+  sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_sag_seg}_labeled_discs_reg.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject ${SUBJECT}
+
+  file_t2_ax_labels=${file_t2_sag_seg}_labeled_discs_reg
+
+  # Label T2w axial spinal cord segmentation. Either using manual disc labels or using disc labels from sagittal image.
+  # Note: here we use sct_label_utils instead of sct_label_vertebrae to avoid SC straightening
+  # Context: https://github.com/spinalcordtoolbox/spinalcordtoolbox/pull/4072
+  sct_label_utils -i ${file_t2_ax_seg}.nii.gz -disc ${file_t2_ax_labels}.nii.gz -o ${file_t2_ax_seg}_labeled.nii.gz
+  # Generate QC report to assess labeled segmentation
+  sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_ax_seg}_labeled.nii.gz -p sct_label_vertebrae -qc ${PATH_QC} -qc-subject ${SUBJECT}
+}
+
+label_compression_if_does_not_exist()
+{
+  ###
+  # This function checks if a manual compression label file already exists, then:
+  #     - If it does, copy it locally.
+  #     - If it doesn't, perform manual compression labeling.
+  # For details, see: https://spinalcordtoolbox.com/stable/user_section/tutorials/shape-analysis/normalizing-morphometrics-compressions/generate-necessary-inputs.html
+  ###
+  local file_t2_ax="$1"
+  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
+
+  # Copy manual compression labels from derivatives/labels if they exist
+  FILECOMPRESSION="${file_t2_ax}_label-compression"
+  FILECOMPRESSIONMANUAL="${bids_folder}/derivatives/labels/${SUBJECT}/anat/${FILECOMPRESSION}"
+  echo "Looking for manual compression labels: ${FILECOMPRESSIONMANUAL}.nii.gz"
+  if [[ -e ${FILECOMPRESSIONMANUAL}.nii.gz ]]; then
+    echo "Found! Using manual compression labels."
+    cp ${FILECOMPRESSIONMANUAL}.nii.gz ${FILECOMPRESSION}.nii.gz
+    # cp "${FILECOMPRESSIONMANUAL}".json "${FILECOMPRESSION}".json  # TODO: uncomment once we have a JSON sidecar for disc labels
+  else
+    echo "Not found. Proceeding with manual compression labeling."
+    # Create an empty compression label file from the T2w axial image (as the compression label file should be in the same space as the T2w axial image)
+    sct_maths -i ${file_t2_ax}.nii.gz -mul 0 -type uint8 -o ${FILECOMPRESSION}.nii.gz
+
+    echo_fsleyes_instructions_compression
+    #fsleyes ${file_t2_sag}.nii.gz ${file_t2_ax}.nii.gz -a 80.0 ${FILECOMPRESSION}.nii.gz   # Do we want to show also sag image in the viewer?
+    fsleyes ${file_t2_ax}.nii.gz ${FILECOMPRESSION}.nii.gz
+    cp ${FILECOMPRESSION}.nii.gz ${FILECOMPRESSIONMANUAL}.nii.gz
+    # TODO: create a JSON sidecar with the information about the user who created the compression labels files
+    echo_with_linebreaks "Compression label file saved as:\n\t"${FILECOMPRESSIONMANUAL}".nii.gz"
+  fi
+}
+
+process_t2w_sag()
+{
+    local contrast=$1
     # Go to anat folder where all structural data are located
     cd anat
 
-    # Construct the file name based on the subject ID, e.g., sub-001_ses-01_T2w
-    file_t2="${participant_id}_${session_id}_${suffix}"
+    # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-sag_T2w
+    file_t2_sag="${participant_id}_${session_id}_${contrast}"
 
     # Segment spinal cord (only if it does not exist)
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
-    segment_if_does_not_exist "$file_t2" t2
-    file_t2_seg="${FILESEG}"
+    segment_if_does_not_exist "$file_t2_sag" t2
+    file_t2_sag_seg="${FILESEG}"
+    label_discs_if_does_not_exist "$file_t2_sag" "$file_t2_sag_seg" acq-sag
 
-    # Open FSLeyes to visualize the segmentation
-    echo_fsleyes_instructions
-    fsleyes "$file_t2".nii.gz "${file_t2_seg}.nii.gz" -cm red -a 70.0
-    # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
-    cp "${file_t2_seg}".nii.gz "${bids_folder}"/derivatives/labels/"${SUBJECT}"/anat/
-    # TODO: continue with the analysis
-    echo -e "Spinal cord segmentation saved as:\n${bids_folder}/derivatives/labels/${SUBJECT}/anat/${file_t2_seg}.nii.gz"
+    # Go back to the subject root folder
+    cd ..
+}
+
+process_t2w_ax()
+{
+    local contrast=$1
+    # Go to anat folder where all structural data are located
+    cd anat
+
+    # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-ax_T2w
+    file_t2_ax="${participant_id}_${session_id}_${contrast}"
+
+    # Segment spinal cord (only if it does not exist)
+    # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
+    segment_if_does_not_exist "$file_t2_ax" t2
+    file_t2_ax_seg="${FILESEG}"
+
+    bring_sag_disc_lables_to_ax "${file_t2_ax}" "${file_t2_ax_seg}"
+
+    label_compression_if_does_not_exist "${file_t2_ax}"
+    file_t2_ax_compression="${FILECOMPRESSION}"
+
+    metrics="diameter_AP area diameter_RL eccentricity solidity"
+    for metric in ${metrics}; do
+        sct_compute_compression -i ${file_t2_ax_seg}.nii.gz -l ${file_t2_ax_compression}.nii.gz -vertfile ${file_t2_ax_seg}_labeled.nii.gz -mode compression -metric ${metric} -o ${PATH_RESULTS}/mscc.csv
+        # TODO: use also '-sex' and '-age' args when they are provided
+    done
+
+    echo_with_linebreaks "Compression metrics saved as:\n\t"${PATH_RESULTS}"/mscc.csv"
+
+    # Go back to the subject root folder
+    cd ..
 }
 
 main_analysis()
@@ -216,21 +406,29 @@ main_analysis()
 
     # Define path to the folder where QC will be stored
     PATH_QC="${results_folder}"/qc
+    PATH_RESULTS="${results_folder}"/results
+    # Create PATH_RESULTS if it does not exist
+    if [ ! -d "${PATH_RESULTS}" ]; then
+        mkdir -p "${PATH_RESULTS}"
+    fi
     SUBJECT="${participant_id}/${session_id}"
+    # TODO: add a path for log files
 
     # Go to subject folder in the results folder
     cd "${SUBJECT}"
 
     # Loop across contrasts (specified by the '-c' arg)
+    # TODO: the order the contrasts are processed is determined by the order they are specified in the command line
     for contrast in "${contrasts[@]}"; do
         case $contrast in
-            T2w)
-                echo_with_linebreaks "Processing T2w image..."
-                process_t2w $contrast
+            acq-sag_T2w)
+                echo_with_linebreaks "Processing T2w sagittal image..."
+                process_t2w_sag $contrast
                 ;;
-#            dwi)
-#                echo "Processing DWI images..."
-#                ;;
+            acq-ax_T2w)
+                echo_with_linebreaks "Processing T2w axial image..."
+                process_t2w_ax $contrast
+                ;;
             *)
                 echo "Analysis for $contrast is not implemented yet :-(. Skipping..."
 #                echo "Unknown contrast: $contrast"
