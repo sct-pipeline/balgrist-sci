@@ -128,7 +128,7 @@ echo_with_linebreaks()
     echo "${line}"
 }
 
-echo_fsleyes_instructions()
+echo_fsleyes_instructions_seg()
 {
     echo_with_linebreaks "Opening FSLeyes, it might take a few seconds...\nCheck the quality of the segmentation, correct the segmentation if necessary ('Tools' --> 'Edit mode'),\nand save it by overwriting the existing file ('Overlay' --> 'Save' --> 'Overwrite').\nThen close FSLeyes to continue."
 }
@@ -191,7 +191,7 @@ segment_if_does_not_exist() {
     sct_deepseg spinalcord -i "${file}".nii.gz -o "${FILESEG}".nii.gz -qc "${PATH_QC}" -qc-subject "${SUBJECT}"
 
     # Open FSLeyes to visualize the segmentation
-    echo_fsleyes_instructions
+    echo_fsleyes_instructions_seg
     fsleyes "$file_t2".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
     # (to be reused in the future analysis)
