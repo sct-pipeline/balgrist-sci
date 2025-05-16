@@ -198,7 +198,7 @@ segment_if_does_not_exist() {
     # TODO: add an entry who QCed and corrected the segmentation to the JSON sidecar
     cp "${FILESEG}".json "${FILESEGMANUAL}".json
 
-    echo -e "Spinal cord segmentation saved as:\n"${FILESEGMANUAL}".nii.gz"
+    echo_with_linebreaks "Spinal cord segmentation saved as:\n\t"${FILESEGMANUAL}".nii.gz\n"
 
   fi
 }
