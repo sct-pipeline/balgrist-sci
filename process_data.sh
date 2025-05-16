@@ -302,12 +302,12 @@ bring_sag_disc_lables_to_ax()
 
 process_t2w_sag()
 {
-    local suffix=$1
+    local contrast=$1
     # Go to anat folder where all structural data are located
     cd anat
 
     # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-sag_T2w
-    file_t2="${participant_id}_${session_id}_${suffix}"
+    file_t2="${participant_id}_${session_id}_${contrast}"
 
     # Segment spinal cord (only if it does not exist)
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
@@ -321,12 +321,12 @@ process_t2w_sag()
 
 process_t2w_ax()
 {
-    local suffix=$1
+    local contrast=$1
     # Go to anat folder where all structural data are located
     cd anat
 
     # Construct the file name based on the subject ID, e.g., sub-001_ses-01_acq-ax_T2w
-    file_t2="${participant_id}_${session_id}_${suffix}"
+    file_t2="${participant_id}_${session_id}_${contrast}"
 
     # Segment spinal cord (only if it does not exist)
     # TODO: redirect sct_deepseg_sc output to LOG file to do not clutter the users terminal
