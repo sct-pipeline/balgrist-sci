@@ -208,7 +208,7 @@ segment_if_does_not_exist() {
 
     # Open FSLeyes to visualize the segmentation
     echo_fsleyes_instructions_seg
-    fsleyes "$file_t2".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
+  fsleyes "${file}".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
     # (to be reused in the future analysis)
     cp "${FILESEG}".nii.gz "${FILESEGMANUAL}".nii.gz
