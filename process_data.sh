@@ -406,6 +406,7 @@ process_t2w_ax()
 
     metrics="diameter_AP area diameter_RL eccentricity solidity"
     for metric in ${metrics}; do
+        # Note that results across subjects (and sessions) are automatically appended to the same CSV file
         sct_compute_compression -i ${file_t2_ax_seg}.nii.gz -l ${file_t2_ax_compression}.nii.gz -vertfile ${file_t2_ax_seg}_labeled.nii.gz -mode compression -metric ${metric} -o ${PATH_RESULTS}/mscc.csv
         # TODO: use also '-sex' and '-age' args when they are provided
     done
