@@ -290,3 +290,11 @@ bash process_data.sh \
   -a 30 \
   -x M
 ```
+
+Another example in the case of two axial sequences:
+```bash
+bash process_data.sh \
+  ...
+  -c acq-sag_T2w acq-ax_chunk-upper_T2w acq-ax_chunk-lower_T2w \
+  ...
+```
