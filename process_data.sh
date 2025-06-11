@@ -319,11 +319,11 @@ bring_sag_disc_lables_to_ax()
   sct_register_multimodal -i ${file_t2_sag}.nii.gz -d ${file_t2_ax}.nii.gz -identity 1 -x nn -qc ${PATH_QC} -qc-subject ${SUBJECT} -dseg ${file_t2_ax_seg}.nii.gz
   # Bring T2w sagittal disc labels (located in the middle of the spinal cord) to T2w axial space
   # Context: https://github.com/sct-pipeline/dcm-metric-normalization/issues/10
-  sct_apply_transfo -i ${file_t2_sag_seg}_labeled_discs.nii.gz -d ${file_t2_ax}.nii.gz -w warp_${file_t2_sag}2${file_t2_ax}.nii.gz -x label
+  sct_apply_transfo -i ${file_t2_sag}_label-disc.nii.gz -d ${file_t2_ax}.nii.gz -w warp_${file_t2_sag}2${file_t2_ax}.nii.gz -x label
   # Generate QC report to assess warped disc labels
-  sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_sag_seg}_labeled_discs_reg.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject ${SUBJECT}
+  sct_qc -i ${file_t2_ax}.nii.gz -s ${file_t2_sag}_label-disc_reg.nii.gz -p sct_label_utils -qc ${PATH_QC} -qc-subject ${SUBJECT}
 
-  file_t2_ax_labels=${file_t2_sag_seg}_labeled_discs_reg
+  file_t2_ax_labels=${file_t2_sag}_label-disc_reg
 
   # Label T2w axial spinal cord segmentation. Either using manual disc labels or using disc labels from sagittal image.
   # Note: here we use sct_label_utils instead of sct_label_vertebrae to avoid SC straightening
