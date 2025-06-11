@@ -401,6 +401,9 @@ process_t2w_ax()
 
     bring_sag_disc_lables_to_ax "${file_t2_ax}" "${file_t2_ax_seg}"
 
+    # Compute shape metrics
+    sct_process_segmentation -i ${file_t2_ax_seg}.nii.gz -vertfile ${file_t2_ax_seg}_labeled.nii.gz -perslice 1 -o ${PATH_RESULTS}/shape_metrics.csv -append 1
+
     label_compression_if_does_not_exist "${file_t2_ax}"
     file_t2_ax_compression="${FILECOMPRESSION}"
 
