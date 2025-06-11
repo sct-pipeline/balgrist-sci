@@ -435,7 +435,7 @@ main_analysis()
                 echo_with_linebreaks "Processing T2w sagittal image..."
                 process_t2w_sag $contrast
                 ;;
-            acq-ax_T2w)
+            acq-ax_T2w | acq-ax_chunk-upper_T2w | acq-ax_chunk-lower_T2w)
                 echo_with_linebreaks "Processing T2w axial image..."
                 process_t2w_ax $contrast
                 ;;
