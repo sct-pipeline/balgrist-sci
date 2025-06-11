@@ -27,6 +27,13 @@
 #        -a 30 \
 #        -x M
 #
+#
+#   Another example in the case of two axial sequences:
+#       bash process_data.sh \
+#        ...
+#        -c acq-sag_T2w acq-ax_chunk-upper_T2w acq-ax_chunk-lower_T2w \
+#        ...
+#
 # Authors: Jan Valosek, Sandrine Bedard
 # AI assistance: Claude 3.5 Sonnet, ChatGPT-4o, and GitHub Copilot
 #
@@ -157,6 +164,14 @@ convert_dcm2nii()
     python "${REPO_DIR}"/file_loader.py -dicom-folder "$dicom_folder" -bids-folder "$bids_folder" -participant "$participant_id" -session "$session_id" -contrasts "${contrasts[@]}" -age "$age" -sex "$sex"
 }
 
+extract_participant_id_and_session_id()
+{
+    # Extract participant_id (sub-XXX) and session_id (ses-XX) from a BIDS-compliant filename
+    local filename="$1"
+    participant_id=$(echo "$filename" | grep -o 'sub-[^_]*')
+    session_id=$(echo "$filename" | grep -o 'ses-[^_]*')
+}
+
 # Create the results folder (specified by the '-r' arg) and copy the NIfTI images from bids folder (specified by
 # the '-b' arg) to it
 # Also, create a folder under derivatives/labels for the current subject to store visually verified segmentations
@@ -208,7 +223,7 @@ segment_if_does_not_exist() {
 
     # Open FSLeyes to visualize the segmentation
     echo_fsleyes_instructions_seg
-    fsleyes "$file_t2".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
+  fsleyes "${file}".nii.gz "${FILESEG}.nii.gz" -cm red -a 70.0
     # Copy the visually verified segmentation (and potentially manually corrected SC seg) to the derivatives folder
     # (to be reused in the future analysis)
     cp "${FILESEG}".nii.gz "${FILESEGMANUAL}".nii.gz
@@ -295,8 +310,10 @@ bring_sag_disc_lables_to_ax()
   ###
   local file_t2_ax="$1"
   local file_t2_ax_seg="$2"
-  local file_t2_sag="${file_t2_ax/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
-  local file_t2_sag_seg="${file_t2_ax_seg/-ax/-sag}"    # TODO: this is very fragile, we should use a more robust way
+  # Construct the sagittal file name based on the T2w axial file name
+  extract_participant_id_and_session_id $file_t2_ax    # Extract participant_id and session_id from the file name
+  local file_t2_sag="${participant_id}_${session_id}_acq-sag_T2w"
+  local file_t2_sag_seg="${file_t2_sag}_label-SC_seg"
 
   # Note: the '-dseg' is used only for the QC report
   sct_register_multimodal -i ${file_t2_sag}.nii.gz -d ${file_t2_ax}.nii.gz -identity 1 -x nn -qc ${PATH_QC} -qc-subject ${SUBJECT} -dseg ${file_t2_ax_seg}.nii.gz
@@ -389,6 +406,7 @@ process_t2w_ax()
 
     metrics="diameter_AP area diameter_RL eccentricity solidity"
     for metric in ${metrics}; do
+        # Note that results across subjects (and sessions) are automatically appended to the same CSV file
         sct_compute_compression -i ${file_t2_ax_seg}.nii.gz -l ${file_t2_ax_compression}.nii.gz -vertfile ${file_t2_ax_seg}_labeled.nii.gz -mode compression -metric ${metric} -o ${PATH_RESULTS}/mscc.csv
         # TODO: use also '-sex' and '-age' args when they are provided
     done
@@ -425,7 +443,7 @@ main_analysis()
                 echo_with_linebreaks "Processing T2w sagittal image..."
                 process_t2w_sag $contrast
                 ;;
-            acq-ax_T2w)
+            acq-ax_T2w | acq-ax_chunk-upper_T2w | acq-ax_chunk-lower_T2w)
                 echo_with_linebreaks "Processing T2w axial image..."
                 process_t2w_ax $contrast
                 ;;
